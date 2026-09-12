@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高階主管特助儀表板 | Executive Assistant Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 圖示庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased flex h-screen overflow-hidden">
+
+    <!-- 1. 左側邊欄 (Sidebar Navigation) -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0">
+        <div>
+            <!-- Logo 區域 -->
+            <div class="h-16 flex items-center px-6 bg-slate-950 font-bold text-lg text-white border-b border-slate-800 gap-3">
+                <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <span>EA Management</span>
+            </div>
+
+            <!-- 主選單 -->
+            <nav class="p-4 space-y-1">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition bg-indigo-600 text-white">
+                    <i class="fa-solid fa-chart-line w-5"></i> 工作儀表板
+                </button>
+                <button onclick="switchTab('schedule')" id="btn-schedule" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">
+                    <i class="fa-regular fa-calendar-check w-5"></i> 行程與接待 (1,6)
+                </button>
+                <button onclick="switchTab('tasks')" id="btn-tasks" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">
+                    <i class="fa-solid fa-list-check w-5"></i> 簽核與決議 (2,3)
+                </button>
+                <button onclick="switchTab('projects')" id="btn-projects" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">
+                    <i class="fa-solid fa-diagram-project w-5"></i> 專案進度 (4,5)
+                </button>
+                <button onclick="switchTab('contacts')" id="btn-contacts" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">
+                    <i class="fa-solid fa-address-book w-5"></i> VIP名片與送禮 (7,8)
+                </button>
+            </nav>
+        </div>
+
+        <!-- 底部使用者卡片 -->
+        <div class="p-4 border-t border-slate-800 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-slate-200">
+                特助
+            </div>
+            <div class="text-xs">
+                <p class="font-semibold text-white">陳特助 (Sarah)</p>
+                <p class="text-slate-500">總經理室 Executive Office</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 2. 主內容區域 (Main Content Area) -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+        
+        <!-- 頂部列 (Header) -->
+        <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0">
+            <!-- 全域關鍵字搜尋 -->
+            <div class="relative w-96">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="globalSearch" oninput="handleSearch()" placeholder="搜尋公文、會議紀錄、VIP名片、專案..." class="w-full pl-9 pr-4 py-1.5 text-sm bg-slate-100 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+            </div>
+
+            <!-- 主管目前狀態與通知 -->
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs px-3 py-1.5 rounded-full border border-emerald-200 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    主管目前狀態：[開會中] 10:00 - 11:30 A公司簡報
+                </div>
+                <button class="relative p-2 text-slate-500 hover:text-slate-700 transition" onclick="alert('通知：【公文#2026-0901】負責人 Mark 已提交最新進度！')">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- 動態內容展示區 (Tab Contents) -->
+        <main class="flex-1 p-6 overflow-y-auto custom-scrollbar">
+
+            <!-- TAB 1: 工作儀表板 (Dashboard Home) -->
+            <section id="tab-dashboard" class="space-y-6">
+                
+                <!-- 頂部統計指標 (KPI Cards) -->
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium">今日主管行程</p>
+                            <p class="text-2xl font-bold text-slate-800 mt-1">4 場</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-lg"><i class="fa-regular fa-calendar"></i></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium">待追蹤簽核/決議</p>
+                            <p class="text-2xl font-bold text-amber-600 mt-1">3 件逾期</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-lg"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium">今日外賓來訪</p>
+                            <p class="text-2xl font-bold text-indigo-600 mt-1">2 組 (1未到)</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg"><i class="fa-solid fa-user-group"></i></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium">中秋送禮規劃</p>
+                            <p class="text-2xl font-bold text-emerald-600 mt-1">85% 已發送</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"><i class="fa-solid fa-gift"></i></div>
+                    </div>
+                </div>
+
+                <!-- 儀表板兩欄佈局 -->
+                <div class="grid grid-cols-3 gap-6">
+                    
+                    <!-- 左欄：今日動態與緊急卡片 (2欄寬) -->
+                    <div class="col-span-2 space-y-6">
+                        
+                        <!-- 外賓接待急件卡片 (職責6) -->
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-id-badge text-indigo-600"></i> 即將到訪外賓接待 (今日)</h3>
+                                <button onclick="quickGuestModal()" class="text-xs text-indigo-600 font-medium hover:underline">+ 登記新訪客</button>
+                            </div>
+                            <div class="space-y-3" id="guest-list">
+                                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-sm">張</div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-slate-800">張董事長 (聯發科技)</p>
+                                            <p class="text-xs text-slate-500">時間: 14:00 | 車號: ABC-8888 | 飲食偏好: 高山烏龍茶 (不喝咖啡)</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="checkInGuest(this)" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-md transition">一鍵報到通知主管</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 簽核與決議事項追蹤看板 (職責2,3) -->
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fa-solid fa-file-signature text-amber-500"></i> 催辦與決議事項追蹤 (Top Priority)</h3>
+                                <button onclick="switchTab('tasks')" class="text-xs text-indigo-600 font-medium hover:underline">查看全部看板 &rarr;</button>
+                            </div>
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-50 text-slate-500 font-semibold uppercase border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-2.5">類別</th>
+                                        <th class="p-2.5">公文/決議事項</th>
+                                        <th class="p-2.5">負責人</th>
+                                        <th class="p-2.5">截止日</th>
+                                        <th class="p-2.5">狀態</th>
+                                        <th class="p-2.5 text-right">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr>
+                                        <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-medium">簽核</span></td>
+                                        <td class="p-2.5 font-medium text-slate-800">2026 Q4 研發預算簽核案</td>
+                                        <td class="p-2.5">Mark (財務)</td>
+                                        <td class="p-2.5 text-red-600 font-medium">昨天 (已逾期)</td>
+                                        <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-red-100 text-red-700 font-medium">追蹤催辦中</span></td>
+                                        <td class="p-2.5 text-right"><button onclick="alert('已發送 LINE/Email 自動提醒給 Mark')" class="text-indigo-600 hover:underline">一鍵催辦</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">會議決議</span></td>
+                                        <td class="p-2.5 font-medium text-slate-800">主管會報：提供子公司合約清單</td>
+                                        <td class="p-2.5">David (法務)</td>
+                                        <td class="p-2.5">今日 17:00</td>
+                                        <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">進行中</span></td>
+                                        <td class="p-2.5 text-right"><button onclick="alert('已發送進度詢問')" class="text-indigo-600 hover:underline">更新進度</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                    <!-- 右欄：主管今日時間軸 (1欄寬) (職責1) -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-800 mb-4 flex items-center justify-between">
+                                <span><i class="fa-regular fa-clock text-blue-600"></i> 主管今日行程時間軸</span>
+                                <span class="text-xs font-normal text-slate-400">2026/09/12</span>
+                            </h3>
+                            <div class="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+                                
+                                <div class="relative">
+                                    <span class="absolute -left-6 top-1 w-3.5 h-3.5 rounded-full bg-slate-300 ring-4 ring-white"></span>
+                                    <p class="text-xs text-slate-400 font-semibold">09:00 - 10:00</p>
+                                    <p class="text-sm font-semibold text-slate-700">內部營運週報會議</p>
+                                    <p class="text-xs text-slate-500">地點: 301 會議室</p>
+                                </div>
+
+                                <div class="relative">
+                                    <span class="absolute -left-6 top-1 w-3.5 h-3.5 rounded-full bg-indigo-600 ring-4 ring-indigo-100"></span>
+                                    <p class="text-xs text-indigo-600 font-semibold">10:00 - 11:30 (進行中)</p>
+                                    <p class="text-sm font-semibold text-slate-800">A 公司合作計畫簡報</p>
+                                    <p class="text-xs text-slate-500">地點: 簡報室 A</p>
+                                </div>
+
+                                <div class="relative">
+                                    <span class="absolute -left-6 top-1 w-3.5 h-3.5 rounded-full bg-slate-300 ring-4 ring-white"></span>
+                                    <p class="text-xs text-slate-400 font-semibold">14:00 - 15:00</p>
+                                    <p class="text-sm font-semibold text-slate-700">張董事長 (聯發科) 到訪</p>
+                                    <p class="text-xs text-slate-500">地點: 貴賓室 (已預約接待)</p>
+                                </div>
+
+                                <div class="relative">
+                                    <span class="absolute -left-6 top-1 w-3.5 h-3.5 rounded-full bg-slate-300 ring-4 ring-white"></span>
+                                    <p class="text-xs text-slate-400 font-semibold">16:30 - 17:30</p>
+                                    <p class="text-sm font-semibold text-slate-700">私人公務餐敘</p>
+                                    <p class="text-xs font-medium text-amber-600"><i class="fa-solid fa-lock text-[10px]"></i> (主管隱私行程)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 快捷操作按鈕 (職責9) -->
+                        <div class="pt-4 border-t border-slate-100 mt-6 grid grid-cols-2 gap-2">
+                            <button onclick="alert('開啟快速新增行程彈窗')" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium text-center transition">+ 新增主管行程</button>
+                            <button onclick="alert('開啟會議記錄錄音與AI生成工具')" class="p-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-medium text-center transition">+ 製作會議記錄</button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- TAB 2: 行程與外賓接待 (Schedule & Guest Management) -->
+            <section id="tab-schedule" class="hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-slate-800">主管行程規劃與外賓接待管理 (職責 1, 6)</h2>
+                    <button onclick="alert('新增行程彈窗')" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">+ 排定新行程</button>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <p class="text-sm text-slate-500">可在此處切換「主管日曆視圖」與「訪客預約名冊」，當行程發生衝突時系統將自動彈出預警。</p>
+                </div>
+            </section>
+
+            <!-- TAB 3: 簽核與決議追蹤 (Task & Document Tracking) -->
+            <section id="tab-tasks" class="hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-slate-800">簽核文件與會議決議追蹤 (職責 2, 3)</h2>
+                    <button onclick="alert('新增追蹤事項')" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">+ 建立追蹤任務</button>
+                </div>
+                <!-- Kanban 板塊簡圖 -->
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <h4 class="font-bold text-sm text-slate-700 mb-3 flex items-center justify-between">
+                            <span>待簽核 / 待指派</span>
+                            <span class="bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-xs">2</span>
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                                <p class="text-xs text-slate-400 font-semibold">公文 #2026-0905</p>
+                                <p class="text-sm font-semibold text-slate-800 mt-1">台北分公司租約續約同意書</p>
+                                <div class="mt-2 text-xs text-slate-500 flex justify-between"><span>呈送人: 行政部</span><span class="text-amber-600 font-medium">限今日</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <h4 class="font-bold text-sm text-slate-700 mb-3 flex items-center justify-between">
+                            <span>執行與追蹤中</span>
+                            <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs">1</span>
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                                <p class="text-xs text-purple-600 font-semibold">董事會決議 #102</p>
+                                <p class="text-sm font-semibold text-slate-800 mt-1">海外擴點可行性評估報告</p>
+                                <div class="mt-2 text-xs text-slate-500 flex justify-between"><span>負責人: 策略長</span><span>9/20 截止</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <h4 class="font-bold text-sm text-slate-700 mb-3 flex items-center justify-between">
+                            <span>主管已核決 / 已結案</span>
+                            <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs">5</span>
+                        </h4>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: 專案進度 (Project Gantt) -->
+            <section id="tab-projects" class="hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-slate-800">行政流程與跨部門專案控管 (職責 4, 5)</h2>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+                    <div>
+                        <div class="flex justify-between text-sm font-semibold mb-1">
+                            <span>專案 Alpha: 全球經銷商大會籌備</span>
+                            <span class="text-indigo-600">75% (符合時程)</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                            <div class="bg-indigo-600 h-full rounded-full" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-semibold mb-1">
+                            <span>專案 Beta: 公司 CSR 永續報告書產出</span>
+                            <span class="text-amber-600">30% (進度稍微落後)</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                            <div class="bg-amber-500 h-full rounded-full" style="width: 30%"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: VIP名片與送禮 (Contacts & Gifts) -->
+            <section id="tab-contacts" class="hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-slate-800">高階主管 VIP 名片庫與節慶送禮紀錄 (職責 7, 8)</h2>
+                    <div class="flex gap-2">
+                        <button onclick="alert('開啟掃描名片')" class="px-3 py-2 bg-slate-800 text-white text-xs font-medium rounded-lg hover:bg-slate-700 transition"><i class="fa-solid fa-camera mr-1"></i> AI 掃描建檔</button>
+                        <button onclick="alert('新增送禮紀錄')" class="px-3 py-2 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700 transition">+ 新增送禮規劃</button>
+                    </div>
+                </div>
+
+                <!-- 兩欄：左名片，右送禮歷史 -->
+                <div class="grid grid-cols-2 gap-6">
+                    
+                    <!-- VIP 名片庫 (職責7) -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-address-card text-indigo-600"></i> VIP 人脈檔案卡</h3>
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <span class="px-2 py-0.5 text-[10px] bg-amber-100 text-amber-800 font-bold rounded">S級 VIP</span>
+                                    <h4 class="font-bold text-base text-slate-800 mt-1">張董事長 (張國華)</h4>
+                                    <p class="text-xs text-slate-500">聯發科技 / 董事長</p>
+                                </div>
+                                <span class="text-xs text-slate-400">上次會面: 2026/08/10</span>
+                            </div>
+                            <div class="text-xs text-slate-600 space-y-1 bg-white p-3 rounded-lg border border-slate-100">
+                                <p><i class="fa-solid fa-heart text-red-400 mr-2"></i><strong>喜好偏好：</strong> 高山烏龍茶、高爾夫球、不愛甜食</p>
+                                <p><i class="fa-solid fa-phone text-slate-400 mr-2"></i><strong>特助電話：</strong> 02-2345-6789 (秘書李小姐)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 送禮歷史紀錄 (職責8) -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-boxes-packing text-emerald-600"></i> 節慶送禮履歷 (防止重複送禮)</h3>
+                        <div class="space-y-3 text-xs">
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center">
+                                <div>
+                                    <p class="font-bold text-slate-800">2026 中秋節禮盒</p>
+                                    <p class="text-slate-500">贈送對象: 張董事長 (聯發科)</p>
+                                    <p class="text-emerald-600 font-medium mt-0.5">禮品: XX飯店手工高山茶葉禮盒 ($3,600)</p>
+                                </div>
+                                <span class="px-2 py-1 bg-emerald-100 text-emerald-700 font-bold rounded">已送達</span>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center opacity-70">
+                                <div>
+                                    <p class="font-bold text-slate-800">2025 端午節禮盒</p>
+                                    <p class="text-slate-500">贈送對象: 張董事長 (聯發科)</p>
+                                    <p class="text-slate-600 mt-0.5">禮品: 經典南北名粽禮盒 ($2,200)</p>
+                                </div>
+                                <span class="px-2 py-1 bg-slate-200 text-slate-700 font-bold rounded">歷史紀錄</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- JavaScript 頁籤切換與互動邏輯 -->
+    <script>
+        function switchTab(tabId) {
+            // 隱藏所有 tab 內容
+            document.querySelectorAll('main > section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            // 顯示目標 tab
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            // 更新 Sidebar 按鈕樣式
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('text-slate-400');
+            });
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-indigo-600', 'text-white');
+                activeBtn.classList.remove('text-slate-400');
+            }
+        }
+
+        function checkInGuest(btnElement) {
+            btnElement.innerText = "✓ 已完成外賓報到通知";
+            btnElement.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+            btnElement.classList.add('bg-emerald-600', 'cursor-not-allowed');
+            alert('系統通知：已自動發送訊息給主管：「張董事長已抵達貴賓室」。');
+        }
+
+        function quickGuestModal() {
+            const name = prompt("請輸入外賓姓名與公司：");
+            if (name) {
+                alert(`已將 [${name}] 新增至今日外賓接待名單！`);
+            }
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('globalSearch').value.toLowerCase();
+            if (query.trim() !== "") {
+                console.log("即時搜尋關鍵字：", query);
+            }
+        }
+    </script>
+</body>
+</html>
