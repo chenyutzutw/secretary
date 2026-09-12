@@ -1,1759 +1,531 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>竹風建設 True Full Land - 高階主管特助系統</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome 圖示庫 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: 引入圓體 (M PLUS Rounded 1c) 400/500/700 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>行政主管儀表板</title>
+  
+  <!-- 1. 修正 Icon 顯示問題：引入最新且穩定的 Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    /* 1. 統一全域字體（繁體中文系統優化） */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", "Microsoft JhengHei", sans-serif !important;
+    }
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        rounded: ['"M PLUS Rounded 1c"', 'Zen Maru Gothic', '"微軟正黑體"', 'sans-serif'],
-                    },
-                    colors: {
-                        custom: {
-                            bg1: '#CCDDFF',
-                            bg2: '#CCCCFF',
-                            bg3: '#E8CCFF',
-                            accent1: '#99BBFF',
-                            accent2: '#9999FF',
-                            accent3: '#5599FF',
-                            text1: '#009FCC',
-                            text2: '#0088A8',
-                            text3: '#007799',
-                            text4: '#00AAAA'
-                        }
-                    },
-                    boxShadow: {
-                        'kpi-custom': '0 10px 25px -5px #9999FF, 0 8px 10px -6px #99BBFF',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* 全站統一字型：粗細適中，基礎字體放大 */
-        * {
-            font-family: 'M PLUS Rounded 1c', 'Zen Maru Gothic', 'PingFang TC', '微軟正黑體', sans-serif !important;
-            font-weight: 400;
-        }
-        body { 
-            background: linear-gradient(135deg, #E6EEFF 0%, #E0E0FF 50%, #F0E6FF 100%);
-            color: #007799; 
-            min-height: 100vh;
-            font-size: 15px; /* 全體放大 */
-        }
-        .font-medium-custom { font-weight: 500 !important; }
-        .font-bold-custom { font-weight: 700 !important; }
+    body {
+      background-color: #f3f4f6;
+      color: #1f2937;
+      padding: 20px;
+    }
 
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #99BBFF; border-radius: 4px; }
-        .canvas-container { border: 2px dashed #0088A8; border-radius: 12px; background: #ffffff; cursor: crosshair; }
-    </style>
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    /* 標題與主管動態列 */
+    .header-bar {
+      grid-column: 1 / -1;
+      background: #ffffff;
+      padding: 16px 24px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #e5e7eb;
+    }
+
+    .header-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* 右上角主管動態狀態標籤 */
+    .leader-status-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .status-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      color: #ffffff;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    /* 區塊通用樣式 */
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 2. 四大 KPI 區域：全面移除陰影 */
+    .kpi-grid {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .kpi-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+      /* 無陰影 */
+      box-shadow: none !important;
+      text-shadow: none !important;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: #ffffff;
+    }
+
+    .kpi-info .kpi-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+
+    .kpi-info .kpi-label {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    /* 主頁左側內容 */
+    .main-left {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 事件列表 (可點擊) */
+    .event-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .event-item {
+      padding: 12px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer; /* 顯示為可點擊 */
+      transition: background-color 0.2s ease;
+    }
+
+    .event-item:hover {
+      background-color: #f9fafb;
+    }
+
+    .event-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .event-time {
+      font-size: 0.85rem;
+      background: #eff6ff;
+      color: #2563eb;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    /* 3. 萬年曆樣式 (箭頭左右) */
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .calendar-nav-btn {
+      background: none;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #374151;
+    }
+
+    .calendar-nav-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+      font-size: 0.875rem;
+    }
+
+    .calendar-day-header {
+      font-weight: 600;
+      color: #6b7280;
+      padding: 6px 0;
+    }
+
+    .calendar-day {
+      padding: 8px 0;
+      border-radius: 6px;
+      color: #374151;
+    }
+
+    .calendar-day.active {
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    .calendar-day.muted {
+      color: #d1d5db;
+    }
+
+    /* 4. 文字備忘錄 */
+    .memo-textarea {
+      width: 100%;
+      height: 140px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.95rem;
+      resize: vertical;
+      outline: none;
+    }
+
+    .memo-textarea:focus {
+      border-color: #2563eb;
+    }
+
+    /* 事件檢視彈窗 Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 450px;
+      width: 90%;
+    }
+
+    .modal-header {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body p {
+      margin-bottom: 8px;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    .modal-close-btn {
+      margin-top: 16px;
+      padding: 8px 16px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      float: right;
+    }
+  </style>
 </head>
-<body class="font-rounded antialiased flex h-screen overflow-hidden text-base">
+<body>
 
-    <!-- 1. 左側邊欄 Navigation -->
-    <aside class="w-64 bg-white/40 backdrop-blur-md border-r border-[#99BBFF] text-[#007799] flex flex-col justify-between shrink-0 shadow-sm">
-        <div>
-            <!-- 竹風建設 Logo 區域 -->
-            <div class="h-20 flex items-center px-4 bg-[#99BBFF]/40 border-b border-[#99BBFF] gap-3">
-                <div class="w-11 h-11 rounded-lg bg-[#007799] text-white flex items-center justify-center text-2xl shadow">
-                    <i class="fa-solid fa-city"></i>
-                </div>
-                <div class="flex flex-col">
-                    <span class="font-medium-custom text-base text-[#007799] tracking-wider">竹風建設</span>
-                    <span class="text-xs text-[#0088A8] tracking-widest">True Full Land</span>
-                </div>
-            </div>
+  <div class="dashboard-container">
+    
+    <!-- Header 區域：含主管動態 -->
+    <header class="header-bar">
+      <div class="header-title">
+        <i class="fa-solid fa-chart-line" style="color: #2563eb;"></i>
+        行政管理綜合儀表板
+      </div>
+      <!-- 右上角主管動態 -->
+      <div class="leader-status-box">
+        <span><i class="fa-solid fa-user-tie"></i> 主管當前動態：</span>
+        <span id="leaderStatusBadge" class="status-badge" style="background-color: #10b981;">載入中...</span>
+      </div>
+    </header>
 
-            <!-- 主選單 -->
-            <nav class="p-4 space-y-2.5">
-                <button onclick="switchTab('main-home')" id="btn-main-home" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base bg-[#5599FF] text-white shadow">
-                    <i class="fa-solid fa-house w-6 text-center"></i> <span>主頁</span>
-                </button>
-                <button onclick="switchTab('calendar')" id="btn-calendar" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base text-[#007799] hover:bg-[#99BBFF]/40 transition">
-                    <i class="fa-regular fa-calendar-days w-6 text-center"></i> <span>行事曆</span>
-                </button>
-                <button onclick="switchTab('tasks')" id="btn-tasks" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base text-[#007799] hover:bg-[#99BBFF]/40 transition">
-                    <i class="fa-solid fa-file-signature w-6 text-center"></i> <span>簽核與決議追蹤</span>
-                </button>
-                <button onclick="switchTab('projects')" id="btn-projects" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base text-[#007799] hover:bg-[#99BBFF]/40 transition">
-                    <i class="fa-solid fa-diagram-project w-6 text-center"></i> <span>專案進度</span>
-                </button>
-                <button onclick="switchTab('contacts')" id="btn-contacts" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base text-[#007799] hover:bg-[#99BBFF]/40 transition">
-                    <i class="fa-solid fa-address-book w-6 text-center"></i> <span>名片資料</span>
-                </button>
-                <button onclick="switchTab('gifts')" id="btn-gifts" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base text-[#007799] hover:bg-[#99BBFF]/40 transition">
-                    <i class="fa-solid fa-gift w-6 text-center"></i> <span>節慶送禮規劃</span>
-                </button>
-                <button onclick="switchTab('notepad')" id="btn-notepad" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base text-[#007799] hover:bg-[#99BBFF]/40 transition">
-                    <i class="fa-solid fa-pen-to-square w-6 text-center"></i> <span>記事本</span>
-                </button>
-            </nav>
+    <!-- 2. 四大 KPI (無陰影邊框樣式) -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background-color: #2563eb;">
+          <i class="fa-solid fa-file-signature"></i>
         </div>
-
-        <!-- 左下角個人名片 -->
-        <div class="p-4 border-t border-[#99BBFF] flex items-center gap-3 bg-white/30">
-            <div title="點擊編輯特助名片" class="relative w-12 h-12 rounded-full overflow-hidden border-2 border-[#5599FF] bg-[#CCDDFF] flex items-center justify-center shrink-0 cursor-pointer hover:opacity-80 transition" onclick="openProfileModal()">
-                <img id="my-avatar-img" src="" class="w-full h-full object-cover hidden">
-                <i id="my-avatar-icon" class="fa-solid fa-user text-[#007799] text-xl"></i>
-            </div>
-            <div class="cursor-pointer" onclick="viewMyCardModal()">
-                <p class="font-medium-custom text-sm text-[#007799] hover:text-[#5599FF] hover:underline" id="profile-display-name">Alice Chen</p>
-                <p class="text-xs text-[#0088A8]" id="profile-display-title">董事長特助</p>
-            </div>
+        <div class="kpi-info">
+          <div class="kpi-value">18 件</div>
+          <div class="kpi-label">待簽核公文</div>
         </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background-color: #10b981;">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div class="kpi-info">
+          <div class="kpi-value">5 場</div>
+          <div class="kpi-label">今日預定會議</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background-color: #f59e0b;">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="kpi-info">
+          <div class="kpi-value">94 %</div>
+          <div class="kpi-label">部門今日出勤率</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background-color: #ef4444;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="kpi-info">
+          <div class="kpi-value">2 項</div>
+          <div class="kpi-label">列管異常事件</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 主頁左側：事件列表 -->
+    <main class="main-left">
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-list-check" style="color: #2563eb;"></i>
+          今日與近期重點日程事件（點擊可檢視詳情）
+        </div>
+        <div class="event-list">
+          <div class="event-item" 
+               data-title="主管晨報與各組會報" 
+               data-time="09:00 - 10:30" 
+               data-location="第一會議室" 
+               data-desc="檢討本周 KPIs 以及追蹤跨部門公文簽核進度。">
+            <div class="event-info">
+              <span class="event-time">09:00 - 10:30</span>
+              <span>主管晨報與各組會報</span>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 0.8rem;"></i>
+          </div>
+
+          <div class="event-item" 
+               data-title="系統資安防護專案審查" 
+               data-time="11:00 - 12:00" 
+               data-location="線上 Teams 會議" 
+               data-desc="審查外部廠商送交之資安弱點掃描報告與修補時程。">
+            <div class="event-info">
+              <span class="event-time">11:00 - 12:00</span>
+              <span>系統資安防護專案審查</span>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 0.8rem;"></i>
+          </div>
+
+          <div class="event-item" 
+               data-title="跨部門業務協調會" 
+               data-time="14:00 - 16:00" 
+               data-location="第二簡報室" 
+               data-desc="研商下季度人力預算與設備採購流程優化案。">
+            <div class="event-info">
+              <span class="event-time">14:00 - 16:00</span>
+              <span>跨部門業務協調會</span>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 0.8rem;"></i>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 主頁右側：萬年曆與文字備忘錄 -->
+    <aside style="display: flex; flex-direction: column; gap: 20px;">
+      
+      <!-- 3. 萬年曆（箭頭已修改為朝向左右） -->
+      <div class="card">
+        <div class="calendar-header">
+          <!-- 左右箭頭按鈕 -->
+          <button class="calendar-nav-btn" id="prevMonth"><i class="fa-solid fa-chevron-left"></i></button>
+          <div style="font-weight: bold;" id="calendarMonthTitle">2026 年 9 月</div>
+          <button class="calendar-nav-btn" id="nextMonth"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="calendar-grid">
+          <div class="calendar-day-header">日</div>
+          <div class="calendar-day-header">一</div>
+          <div class="calendar-day-header">二</div>
+          <div class="calendar-day-header">三</div>
+          <div class="calendar-day-header">四</div>
+          <div class="calendar-day-header">五</div>
+          <div class="calendar-day-header">六</div>
+          
+          <!-- 日期靜態預覽範例 -->
+          <div class="calendar-day muted">30</div>
+          <div class="calendar-day">1</div>
+          <div class="calendar-day">2</div>
+          <div class="calendar-day">3</div>
+          <div class="calendar-day">4</div>
+          <div class="calendar-day">5</div>
+          <div class="calendar-day">6</div>
+          <div class="calendar-day">7</div>
+          <div class="calendar-day">8</div>
+          <div class="calendar-day">9</div>
+          <div class="calendar-day">10</div>
+          <div class="calendar-day">11</div>
+          <div class="calendar-day">12</div>
+          <div class="calendar-day active">13</div>
+          <div class="calendar-day">14</div>
+          <div class="calendar-day">15</div>
+          <div class="calendar-day">16</div>
+          <div class="calendar-day">17</div>
+          <div class="calendar-day">18</div>
+          <div class="calendar-day">19</div>
+        </div>
+      </div>
+
+      <!-- 4. 文字備忘錄：已清除預設提示文字 -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-regular fa-note-sticky" style="color: #f59e0b;"></i>
+          隨手筆記 / 備忘錄
+        </div>
+        <textarea class="memo-textarea" placeholder=""></textarea>
+      </div>
+
     </aside>
 
-    <!-- 2. 主內容區域 -->
-    <div class="flex-1 flex flex-col h-screen overflow-hidden">
-        
-        <!-- Header 頂部列 -->
-        <header class="h-16 bg-white/20 border-b border-[#99BBFF] px-6 flex items-center justify-between shrink-0">
-            <div class="relative w-96">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-[#0088A8] text-base"></i>
-                <input type="text" id globalSearchInput oninput="handleGlobalSearch()" placeholder="全網搜尋 (專案、名片、簽核、行程...)" class="w-full pl-10 pr-4 py-2 text-sm bg-white/70 border border-[#99BBFF] text-[#007799] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#5599FF]">
-                <div id="search-results-dropdown" class="absolute left-0 top-12 w-full bg-white/95 border border-[#99BBFF] rounded-xl shadow-xl z-50 max-h-80 overflow-y-auto custom-scrollbar hidden p-2 space-y-1"></div>
-            </div>
+  </div>
 
-            <div class="flex items-center gap-5">
-                <div class="text-right text-xs text-[#007799]">
-                    <div id="clock-date" class="font-medium-custom">2026-09-13 (日)</div>
-                    <div id="clock-time" class="text-[#0088A8] font-mono text-sm">01:00:00</div>
-                </div>
-                <div id="boss-status-badge" class="flex items-center gap-2 text-xs px-3.5 py-1.5 rounded-full border border-[#99BBFF] bg-white/60 shadow-sm">
-                    <span id="boss-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span id="boss-status-text" class="text-[#007799] font-medium-custom">主管在辦公室</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- 動態內容區域 -->
-        <main class="flex-1 p-6 overflow-y-auto custom-scrollbar">
-
-            <!-- PAGE 1: 主頁 (Dashboard) -->
-            <section id="tab-main-home" class="space-y-6">
-                <!-- 四大 KPI -->
-                <div class="grid grid-cols-4 gap-5">
-                    <div onclick="switchTab('calendar')" class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-kpi-custom hover:translate-y-[-2px] transition cursor-pointer border-l-4 border-l-[#5599FF]">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs text-[#0088A8]">今日主管行程</p>
-                                <p class="text-2xl font-medium-custom text-[#007799] mt-1" id="kpi-today-count">3 場行程</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-xl bg-[#CCDDFF]/60 text-[#007799] flex items-center justify-center text-xl"><i class="fa-regular fa-calendar-check"></i></div>
-                        </div>
-                    </div>
-
-                    <div onclick="switchTab('tasks')" class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-kpi-custom hover:translate-y-[-2px] transition cursor-pointer border-l-4 border-l-[#9999FF]">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs text-[#0088A8]">待追蹤簽核</p>
-                                <p class="text-2xl font-medium-custom text-[#007799] mt-1" id="kpi-task-count">2 件待辦</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-xl bg-[#E8CCFF]/60 text-[#007799] flex items-center justify-center text-xl"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                        </div>
-                    </div>
-
-                    <div onclick="switchTab('projects')" class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-kpi-custom hover:translate-y-[-2px] transition cursor-pointer border-l-4 border-l-[#5599FF]">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs text-[#0088A8]">進行中專案</p>
-                                <p class="text-2xl font-medium-custom text-[#007799] mt-1" id="kpi-project-count">3 項專案</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-xl bg-[#CCDDFF]/60 text-[#007799] flex items-center justify-center text-xl"><i class="fa-solid fa-diagram-project"></i></div>
-                        </div>
-                    </div>
-
-                    <div onclick="switchTab('gifts')" class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-kpi-custom hover:translate-y-[-2px] transition cursor-pointer border-l-4 border-l-[#9999FF]">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs text-[#0088A8]">送禮規劃進度</p>
-                                <p class="text-2xl font-medium-custom text-[#007799] mt-1">100% 已紀錄</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-xl bg-[#E8CCFF]/60 text-[#007799] flex items-center justify-center text-xl"><i class="fa-solid fa-gift"></i></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 公告與快捷操作 -->
-                <div class="grid grid-cols-3 gap-6">
-                    <div class="col-span-2 bg-white/70 p-5 rounded-2xl border border-[#99BBFF] space-y-4 shadow-sm">
-                        <h3 class="font-medium-custom text-lg text-[#007799] flex items-center gap-2 border-b border-[#99BBFF]/60 pb-3">
-                            <i class="fa-solid fa-bullhorn text-[#5599FF]"></i> 竹風建設 重要公告與行政焦點
-                        </h3>
-                        <div class="space-y-3 text-sm text-[#007799]">
-                            <div class="p-3.5 bg-white/60 rounded-xl border border-[#99BBFF]/50">
-                                <span class="bg-[#5599FF] text-white px-2.5 py-0.5 rounded text-xs font-medium-custom">公司重大工程</span>
-                                <p class="text-base font-medium-custom mt-1.5">竹北「竹風樹海」二期建案動土典禮預備會議</p>
-                                <p class="text-[#0088A8] mt-1 text-xs">請特助確認建築師團隊與縣府官員出席名單。</p>
-                            </div>
-                            <div class="p-3.5 bg-white/60 rounded-xl border border-[#99BBFF]/50">
-                                <span class="bg-[#9999FF] text-white px-2.5 py-0.5 rounded text-xs font-medium-custom">董事會通知</span>
-                                <p class="text-base font-medium-custom mt-1.5">Q3 經營績效審查會呈報資料簽核</p>
-                                <p class="text-[#0088A8] mt-1 text-xs">請於本週五前完成財務部與研發部之報告彙整。</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white/70 p-5 rounded-2xl border border-[#99BBFF] space-y-3 shadow-sm">
-                        <h3 class="font-medium-custom text-lg text-[#007799] border-b border-[#99BBFF]/60 pb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-bolt text-[#5599FF]"></i> 快捷操作
-                        </h3>
-                        <button onclick="openScheduleModal()" class="w-full py-3 bg-[#5599FF] text-white rounded-xl text-sm font-medium-custom hover:bg-[#9999FF] transition shadow-sm flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-calendar-plus"></i> 新增主管行程
-                        </button>
-                        <button onclick="openTaskModal()" class="w-full py-3 bg-[#00AAAA] text-white rounded-xl text-sm font-medium-custom hover:bg-[#0088A8] transition shadow-sm flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-file-circle-plus"></i> 呈送簽核任務
-                        </button>
-                        <button onclick="openContactModal()" class="w-full py-3 bg-[#9999FF] text-white rounded-xl text-sm font-medium-custom hover:bg-[#5599FF] transition shadow-sm flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-user-plus"></i> 新增 VIP 名片
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- PAGE 2: 行事曆 (萬年曆與行程) -->
-            <section id="tab-calendar" class="hidden space-y-6">
-                <!-- 上層：月曆區 -->
-                <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b border-[#99BBFF]/60 pb-3">
-                        <button onclick="changeMonth(-1)" class="w-10 h-10 rounded-full bg-[#CCDDFF]/50 hover:bg-[#5599FF] hover:text-white flex items-center justify-center text-lg text-[#007799] transition" title="上個月">▲</button>
-                        <h3 class="font-medium-custom text-xl text-[#007799]" id="calendar-month-year-display">2026 年 09 月</h3>
-                        <button onclick="changeMonth(1)" class="w-10 h-10 rounded-full bg-[#CCDDFF]/50 hover:bg-[#5599FF] hover:text-white flex items-center justify-center text-lg text-[#007799] transition" title="下個月">▼</button>
-                    </div>
-                    
-                    <div class="grid grid-cols-7 gap-1 text-center text-sm text-[#0088A8] font-medium-custom py-2 border-b border-[#99BBFF]/30">
-                        <div class="text-rose-500">日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div class="text-rose-500">六</div>
-                    </div>
-                    <div class="grid grid-cols-7 gap-2 text-center text-xs" id="calendar-days-grid"></div>
-                </div>
-
-                <!-- 下層：詳細行程列表 -->
-                <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b border-[#99BBFF]/60 pb-3">
-                        <h3 class="font-medium-custom text-lg text-[#007799] flex items-center gap-2">
-                            <i class="fa-solid fa-list-check text-[#5599FF]"></i> 當日詳細行程列表 (點擊可檢視完整內容)
-                        </h3>
-                        <div class="flex items-center gap-3">
-                            <span class="text-sm bg-[#CCDDFF] text-[#007799] px-3.5 py-1 rounded-full font-medium-custom" id="selected-date-badge">2026-09-01</span>
-                            <button onclick="openScheduleModal()" class="px-4 py-2 bg-[#5599FF] text-white rounded-xl text-xs hover:bg-[#9999FF] transition shadow-sm flex items-center gap-1.5">
-                                <i class="fa-solid fa-plus"></i> 新增此日行程
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 min-h-[150px]" id="selected-day-schedule-list"></div>
-                </div>
-            </section>
-
-            <!-- PAGE 3: 簽核與決議追蹤 -->
-            <section id="tab-tasks" class="hidden space-y-6">
-                <div class="flex items-center justify-between bg-white/80 p-4 rounded-2xl border border-[#99BBFF]">
-                    <h2 class="text-lg font-medium-custom text-[#007799] flex items-center gap-2">
-                        <i class="fa-solid fa-file-signature text-[#5599FF]"></i> 簽核與決議追蹤
-                    </h2>
-                    <button onclick="openTaskModal()" class="px-4 py-2 bg-[#5599FF] text-white text-xs rounded-xl hover:bg-[#9999FF] transition shadow-sm flex items-center gap-1.5">
-                        <i class="fa-solid fa-plus"></i> 新增簽核任務
-                    </button>
-                </div>
-
-                <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="border-b border-[#99BBFF] text-[#0088A8] bg-[#CCDDFF]/30 font-medium-custom">
-                                <th class="p-3">上方的專案名稱</th>
-                                <th class="p-3">分類</th>
-                                <th class="p-3">呈送單位</th>
-                                <th class="p-3">負責人</th>
-                                <th class="p-3">截止日</th>
-                                <th class="p-3">簽核狀態</th>
-                                <th class="p-3 text-center">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="task-table-body" class="divide-y divide-[#99BBFF]/30 text-[#007799]"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- PAGE 4: 專案進度 -->
-            <section id="tab-projects" class="hidden space-y-6">
-                <div class="flex items-center justify-between bg-white/80 p-4 rounded-2xl border border-[#99BBFF]">
-                    <h2 class="text-lg font-medium-custom text-[#007799] flex items-center gap-2">
-                        <i class="fa-solid fa-diagram-project text-[#00AAAA]"></i> 專案進度控管
-                    </h2>
-                    <button onclick="openProjectModal()" class="px-4 py-2 bg-[#00AAAA] text-white text-xs rounded-xl hover:bg-[#0088A8] transition shadow-sm flex items-center gap-1.5">
-                        <i class="fa-solid fa-plus"></i> 新增專案
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-2 gap-6" id="projects-container"></div>
-            </section>
-
-            <!-- PAGE 5: 名片資料 -->
-            <section id="tab-contacts" class="hidden space-y-6">
-                <div class="flex items-center justify-between bg-white/80 p-4 rounded-2xl border border-[#99BBFF]">
-                    <h2 class="text-lg font-medium-custom text-[#007799] flex items-center gap-2">
-                        <i class="fa-solid fa-address-book text-[#5599FF]"></i> VIP 名片資料庫
-                    </h2>
-                    <button onclick="openContactModal()" class="px-4 py-2 bg-[#5599FF] text-white text-xs rounded-xl hover:bg-[#9999FF] transition shadow-sm flex items-center gap-1.5">
-                        <i class="fa-solid fa-plus"></i> 新增名片
-                    </button>
-                </div>
-
-                <div class="bg-white/80 p-4 rounded-2xl border border-[#99BBFF]">
-                    <div class="relative w-full">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-[#0088A8] text-sm"></i>
-                        <input type="text" id="contactSearch" oninput="renderContacts()" placeholder="搜尋姓名、公司、手機、喜好、認識地點..." class="w-full pl-10 pr-4 py-2 text-sm bg-white/70 border border-[#99BBFF] text-[#007799] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#5599FF]">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-6" id="contacts-container"></div>
-            </section>
-
-            <!-- PAGE 6: 節慶送禮規劃 -->
-            <section id="tab-gifts" class="hidden space-y-6">
-                <div class="flex items-center justify-between bg-white/80 p-4 rounded-2xl border border-[#99BBFF]">
-                    <h2 class="text-lg font-medium-custom text-[#007799] flex items-center gap-2">
-                        <i class="fa-solid fa-gift text-[#9999FF]"></i> 節慶與公關送禮規劃
-                    </h2>
-                    <button onclick="openGiftModal()" class="px-4 py-2 bg-[#9999FF] text-white text-xs rounded-xl hover:bg-[#5599FF] transition shadow-sm flex items-center gap-1.5">
-                        <i class="fa-solid fa-plus"></i> 新增送禮紀錄
-                    </button>
-                </div>
-
-                <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="border-b border-[#99BBFF] text-[#0088A8] bg-[#CCDDFF]/30 font-medium-custom">
-                                <th class="p-3">節慶分類</th>
-                                <th class="p-3">對象姓名</th>
-                                <th class="p-3">禮品內容</th>
-                                <th class="p-3">金額</th>
-                                <th class="p-3">日期</th>
-                                <th class="p-3">狀態</th>
-                                <th class="p-3">備註</th>
-                                <th class="p-3 text-center">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gift-table-body" class="divide-y divide-[#99BBFF]/30 text-[#007799]"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- PAGE 7: 記事本 -->
-            <section id="tab-notepad" class="hidden space-y-6">
-                <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm space-y-3">
-                    <div class="flex justify-between items-center border-b border-[#99BBFF]/60 pb-3">
-                        <h3 class="font-medium-custom text-base text-[#007799] flex items-center gap-2">
-                            <i class="fa-solid fa-file-pen text-[#5599FF]"></i> 文字備忘錄
-                        </h3>
-                        <button onclick="saveTextNote()" class="px-4 py-2 bg-[#5599FF] text-white text-xs rounded-xl hover:bg-[#9999FF] transition shadow-sm flex items-center gap-1.5">
-                            <i class="fa-solid fa-floppy-disk"></i> 儲存備忘錄
-                        </button>
-                    </div>
-
-                    <div class="flex items-center gap-2 bg-[#CCDDFF]/30 p-2 rounded-xl text-sm">
-                        <button onclick="execCmd('bold')" class="px-3 py-1 bg-white rounded border hover:bg-slate-100 font-bold" title="粗體">B</button>
-                        <button onclick="execCmd('underline')" class="px-3 py-1 bg-white rounded border hover:bg-slate-100 underline" title="底線">U</button>
-                        <button onclick="execCmd('italic')" class="px-3 py-1 bg-white rounded border hover:bg-slate-100 italic" title="斜體">I</button>
-                        <span class="text-slate-300">|</span>
-                        <label class="text-[#0088A8]">文字顏色：</label>
-                        <input type="color" onchange="execCmd('foreColor', this.value)" class="w-7 h-7 border-0 rounded cursor-pointer">
-                    </div>
-
-                    <div id="rich-editor" contenteditable="true" class="w-full h-40 p-4 bg-white/90 border border-[#99BBFF] rounded-xl text-sm text-[#007799] focus:outline-none overflow-y-auto">
-                        在此可編輯會議紀錄、公文摘要或隨手筆記...
-                    </div>
-
-                    <div class="pt-2 border-t border-[#99BBFF]/40 space-y-2">
-                        <p class="text-xs text-[#0088A8] font-medium-custom">歷史備忘錄紀錄：</p>
-                        <div id="saved-notes-list" class="flex flex-wrap gap-2"></div>
-                    </div>
-                </div>
-
-                <!-- 數位手繪與簽名板 -->
-                <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm space-y-3">
-                    <div class="flex justify-between items-center border-b border-[#99BBFF]/60 pb-3">
-                        <h3 class="font-medium-custom text-base text-[#007799] flex items-center gap-2">
-                            <i class="fa-solid fa-palette text-[#00AAAA]"></i> 數位手繪與簽名板
-                        </h3>
-                        <div class="flex items-center gap-2">
-                            <button onclick="clearCanvas()" class="px-3.5 py-1.5 bg-[#FF8888] text-white text-xs rounded-xl hover:bg-red-400 transition flex items-center gap-1">
-                                <i class="fa-solid fa-trash"></i> 清空
-                            </button>
-                            <button onclick="downloadCanvas()" class="px-3.5 py-1.5 bg-[#00AAAA] text-white text-xs rounded-xl hover:bg-[#0088A8] transition flex items-center gap-1">
-                                <i class="fa-solid fa-download"></i> 下載圖檔
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4 bg-[#CCDDFF]/30 p-2.5 rounded-xl text-xs text-[#007799]">
-                        <div class="flex items-center gap-1.5">
-                            <label>筆觸顏色：</label>
-                            <input type="color" id="brushColor" value="#007799" class="w-6 h-6 border-0 rounded cursor-pointer">
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <label>粗細：</label>
-                            <input type="range" id="brushSize" min="1" max="12" value="3" class="w-28 cursor-pointer">
-                        </div>
-                    </div>
-
-                    <div class="canvas-container overflow-hidden">
-                        <canvas id="drawingCanvas" width="900" height="300" class="w-full bg-white"></canvas>
-                    </div>
-                </div>
-            </section>
-        </main>
+  <!-- 事件檢視彈窗 Modal -->
+  <div class="modal-overlay" id="eventModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span id="modalTitle">事件名稱</span>
+        <i class="fa-solid fa-xmark" style="cursor: pointer; color: #9ca3af;" onclick="closeModal()"></i>
+      </div>
+      <div class="modal-body">
+        <p><strong><i class="fa-regular fa-clock"></i> 時間：</strong><span id="modalTime"></span></p>
+        <p><strong><i class="fa-solid fa-location-dot"></i> 地點：</strong><span id="modalLocation"></span></p>
+        <p><strong><i class="fa-regular fa-file-lines"></i> 說明：</strong><span id="modalDesc"></span></p>
+      </div>
+      <button class="modal-close-btn" onclick="closeModal()">關閉</button>
     </div>
+  </div>
 
-    <!-- 3. MODALS 彈窗系統 -->
+  <script>
+    // 5. 主頁下方事件點擊並檢視詳情
+    document.querySelectorAll('.event-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.getElementById('modalTitle').innerText = this.dataset.title;
+        document.getElementById('modalTime').innerText = this.dataset.time;
+        document.getElementById('modalLocation').innerText = this.dataset.location;
+        document.getElementById('modalDesc').innerText = this.dataset.desc;
+        document.getElementById('eventModal').style.display = 'flex';
+      });
+    });
 
-    <!-- Modal: 通用詳細內容檢視 -->
-    <div id="modal-detail-view" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-6 w-[550px] border-2 border-[#99BBFF] shadow-xl space-y-4 max-h-[85vh] overflow-y-auto custom-scrollbar">
-            <div class="flex justify-between items-center border-b border-[#99BBFF] pb-3">
-                <h3 class="text-lg font-medium-custom text-[#007799]" id="detail-modal-title">詳細內容</h3>
-                <button onclick="closeModal('modal-detail-view')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div id="detail-modal-body" class="space-y-3 text-sm text-[#007799]"></div>
-            <div class="flex justify-end pt-2">
-                <button onclick="closeModal('modal-detail-view')" class="px-5 py-2 bg-[#5599FF] text-white text-xs rounded-xl">關閉</button>
-            </div>
-        </div>
-    </div>
+    function closeModal() {
+      document.getElementById('eventModal').style.display = 'none';
+    }
 
-    <!-- Modal: 特助個人名片編輯 -->
-    <div id="modal-profile" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-6 w-[450px] border-2 border-[#99BBFF] shadow-xl space-y-4">
-            <h3 class="text-lg font-medium-custom text-[#007799] border-b border-[#99BBFF] pb-3">編輯個人名片</h3>
-            <div class="space-y-3 text-xs text-[#007799]">
-                <div>
-                    <label class="block mb-1 text-[#0088A8]">上傳大頭照 (選擇圖片檔)</label>
-                    <input type="file" id="profile-avatar-input" accept="image/*" class="w-full p-2 border border-[#99BBFF] rounded-lg bg-white">
-                </div>
-                <div><label class="block mb-1 text-[#0088A8]">姓名</label><input type="text" id="edit-profile-name" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">職稱</label><input type="text" id="edit-profile-title" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">手機</label><input type="text" id="edit-profile-phone" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">Email</label><input type="text" id="edit-profile-email" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeModal('modal-profile')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs rounded-lg">取消</button>
-                <button onclick="saveProfile()" class="px-4 py-2 bg-[#5599FF] text-white text-xs rounded-lg">儲存名片</button>
-            </div>
-        </div>
-    </div>
+    // 6. 右上角主管動態：根據行事曆日程時間變更狀態
+    // 定義主管今天的行事曆日程設定
+    const leaderSchedule = [
+      { start: "09:00", end: "10:30", status: "主管晨報中", color: "#ef4444" }, // 紅色：會議中
+      { start: "11:00", end: "12:00", status: "專案審查中", color: "#f59e0b" }, // 黃色：審查中
+      { start: "14:00", end: "16:00", status: "跨部門會報", color: "#3b82f6" }  // 藍色：外會/行程
+    ];
 
-    <!-- Modal: 新增/編輯 行事曆 -->
-    <div id="modal-schedule" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-6 w-[480px] border-2 border-[#99BBFF] shadow-xl space-y-4">
-            <h3 class="text-lg font-medium-custom text-[#007799] border-b border-[#99BBFF] pb-3" id="sched-modal-title">排定主管行程</h3>
-            <div class="space-y-3 text-xs text-[#007799]">
-                <div><label class="block mb-1 text-[#0088A8]">行程日期</label><input type="date" id="sched-date" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">時間範圍</label><input type="text" id="sched-time" placeholder="例如: 10:00 - 11:30" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">行程標題 (會議/餐敘/出差/拜訪...)</label><input type="text" id="sched-title" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">地點</label><input type="text" id="sched-location" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">詳細內容</label><textarea id="sched-content" rows="2" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></textarea></div>
-                <div><label class="block mb-1 text-[#0088A8]">備註</label><input type="text" id="sched-remark" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeModal('modal-schedule')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs rounded-lg">取消</button>
-                <button onclick="saveSchedule()" class="px-4 py-2 bg-[#5599FF] text-white text-xs rounded-lg">儲存行程</button>
-            </div>
-        </div>
-    </div>
+    function updateLeaderStatus() {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-    <!-- Modal: 新增/編輯 簽核任務 -->
-    <div id="modal-task" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-6 w-[480px] border-2 border-[#99BBFF] shadow-xl space-y-4">
-            <h3 class="text-lg font-medium-custom text-[#007799] border-b border-[#99BBFF] pb-3" id="task-modal-title">呈送簽核任務</h3>
-            <div class="space-y-3 text-xs text-[#007799]">
-                <div><label class="block mb-1 text-[#0088A8]">專案名稱</label><input type="text" id="task-name" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div>
-                    <label class="block mb-1 text-[#0088A8]">任務分類</label>
-                    <select id="task-category" class="w-full p-2.5 border border-[#99BBFF] rounded-lg bg-white text-sm">
-                        <option value="董事會提案">董事會提案</option>
-                        <option value="工程採購案">工程採購案</option>
-                        <option value="土地開發案">土地開發案</option>
-                        <option value="行銷企劃案">行銷企劃案</option>
-                        <option value="行政管理">行政管理</option>
-                    </select>
-                </div>
-                <div><label class="block mb-1 text-[#0088A8]">呈送單位</label><input type="text" id="task-unit" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">負責人</label><input type="text" id="task-owner" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">截止日期</label><input type="date" id="task-deadline" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div>
-                    <label class="block mb-1 text-[#0088A8]">簽核狀態</label>
-                    <select id="task-status" class="w-full p-2.5 border border-[#99BBFF] rounded-lg bg-white text-sm">
-                        <option value="審核中">審核中</option>
-                        <option value="已核准">已核准</option>
-                        <option value="需修正">需修正</option>
-                    </select>
-                </div>
-                <div><label class="block mb-1 text-[#0088A8]">摘要說明</label><textarea id="task-desc" rows="2" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></textarea></div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeModal('modal-task')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs rounded-lg">取消</button>
-                <button onclick="saveTask()" class="px-4 py-2 bg-[#5599FF] text-white text-xs rounded-lg">儲存任務</button>
-            </div>
-        </div>
-    </div>
+      let currentStatus = "在席 / 可洽公";
+      let statusColor = "#10b981"; // 綠色：空閒在席
 
-    <!-- Modal: 新增/編輯 專案進度 -->
-    <div id="modal-project" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-6 w-[520px] border-2 border-[#99BBFF] shadow-xl space-y-4 max-h-[85vh] overflow-y-auto custom-scrollbar">
-            <h3 class="text-lg font-medium-custom text-[#007799] border-b border-[#99BBFF] pb-3" id="proj-modal-title">新增 / 編輯專案進度</h3>
-            <div class="space-y-3 text-xs text-[#007799]">
-                <div><label class="block mb-1 text-[#0088A8]">專案名稱</label><input type="text" id="proj-title" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div>
-                    <label class="block mb-1 text-[#0088A8]">專案類型</label>
-                    <select id="proj-category" class="w-full p-2.5 border border-[#99BBFF] rounded-lg bg-white text-sm">
-                        <option value="營建工程">營建工程</option>
-                        <option value="土地開發">土地開發</option>
-                        <option value="行銷推案">行銷推案</option>
-                        <option value="集團行政">集團行政</option>
-                    </select>
-                </div>
-                <div><label class="block mb-1 text-[#0088A8]">進度百分比 (%)</label><input type="number" id="proj-progress" min="0" max="100" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">專案負責人</label><input type="text" id="proj-owner" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">重要進度描述 / 說明</label><textarea id="proj-desc" rows="3" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></textarea></div>
-                <div><label class="block mb-1 text-[#0088A8]">附件檔案 (多檔名稱用逗號分開)</label><input type="text" id="proj-files" placeholder="例如: 藍圖.pdf, 預算表.xlsx" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeModal('modal-project')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs rounded-lg">取消</button>
-                <button onclick="saveProject()" class="px-4 py-2 bg-[#00AAAA] text-white text-xs rounded-lg">儲存專案</button>
-            </div>
-        </div>
-    </div>
+      for (const item of leaderSchedule) {
+        const [sHour, sMin] = item.start.split(':').map(Number);
+        const [eHour, eMin] = item.end.split(':').map(Number);
+        const startMinutes = sHour * 60 + sMin;
+        const endMinutes = eHour * 60 + eMin;
 
-    <!-- Modal: 新增/編輯 名片資料 (含大頭照、喜好、上次見面、認識地點) -->
-    <div id="modal-contact" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-6 w-[500px] border-2 border-[#99BBFF] shadow-xl space-y-4 max-h-[85vh] overflow-y-auto custom-scrollbar">
-            <h3 class="text-lg font-medium-custom text-[#007799] border-b border-[#99BBFF] pb-3" id="contact-modal-title">新增 / 編輯 VIP 名片</h3>
-            <div class="space-y-3 text-xs text-[#007799]">
-                <div>
-                    <label class="block mb-1 text-[#0088A8]">大頭照 (照片網址 / Base64)</label>
-                    <input type="text" id="card-photo" placeholder="https://... 或上傳檔案" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm">
-                </div>
-                <div><label class="block mb-1 text-[#0088A8]">姓名</label><input type="text" id="card-name" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">公司與部門</label><input type="text" id="card-company" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">職稱</label><input type="text" id="card-title" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">電話 / 手機</label><input type="text" id="card-phone" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">Email</label><input type="text" id="card-email" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">喜好與飲食偏好</label><input type="text" id="card-preference" placeholder="例如: 喜愛高爾夫、喝熟成普洱茶、不吃海鮮" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">上次見面時間</label><input type="date" id="card-last-meet" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">認識地點 / 場合</label><input type="text" id="card-meet-place" placeholder="例如: 2024 營建公會春酒、竹北案場簽約儀式" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">其他備註說明</label><textarea id="card-remark" rows="2" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></textarea></div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeModal('modal-contact')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs rounded-lg">取消</button>
-                <button onclick="saveContact()" class="px-4 py-2 bg-[#5599FF] text-white text-xs rounded-lg">儲存名片</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: 新增/編輯 節慶送禮規劃 -->
-    <div id="modal-gift" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-6 w-[480px] border-2 border-[#99BBFF] shadow-xl space-y-4">
-            <h3 class="text-lg font-medium-custom text-[#007799] border-b border-[#99BBFF] pb-3" id="gift-modal-title">新增 / 編輯送禮紀錄</h3>
-            <div class="space-y-3 text-xs text-[#007799]">
-                <div>
-                    <label class="block mb-1 text-[#0088A8]">節慶分類</label>
-                    <select id="gift-festival" class="w-full p-2.5 border border-[#99BBFF] rounded-lg bg-white text-sm">
-                        <option value="中秋節">中秋節</option>
-                        <option value="端午節">端午節</option>
-                        <option value="農曆新春">農曆新春</option>
-                        <option value="生日賀禮">生日賀禮</option>
-                        <option value="公關拜訪">公關拜訪</option>
-                    </select>
-                </div>
-                <div><label class="block mb-1 text-[#0088A8]">對象姓名</label><input type="text" id="gift-target" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">禮品內容</label><input type="text" id="gift-item" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">預算金額 (NT$)</label><input type="number" id="gift-amount" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div><label class="block mb-1 text-[#0088A8]">送達日期</label><input type="date" id="gift-date" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></div>
-                <div>
-                    <label class="block mb-1 text-[#0088A8]">送禮狀態</label>
-                    <select id="gift-status" class="w-full p-2.5 border border-[#99BBFF] rounded-lg bg-white text-sm">
-                        <option value="已送達">已送達</option>
-                        <option value="準備中">準備中</option>
-                        <option value="處理中">處理中</option>
-                    </select>
-                </div>
-                <div><label class="block mb-1 text-[#0088A8]">備註</label><textarea id="gift-remark" rows="2" class="w-full p-2.5 border border-[#99BBFF] rounded-lg text-sm"></textarea></div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeModal('modal-gift')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs rounded-lg">取消</button>
-                <button onclick="saveGift()" class="px-4 py-2 bg-[#9999FF] text-white text-xs rounded-lg">儲存紀錄</button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- 4. JAVASCRIPT 邏輯運作 -->
-    <script>
-        // === 資料狀態定義 ===
-        let currentYear = 2026;
-        let currentMonth = 8; // 0=1月, 8=9月
-        let selectedDateStr = '2026-09-01';
-
-        let editingSchedId = null;
-        let editingTaskId = null;
-        let editingProjId = null;
-        let editingContactId = null;
-        let editingGiftId = null;
-
-        // 特助個人資料
-        let myProfile = {
-            name: "Alice Chen",
-            title: "董事長特助",
-            phone: "0912-345-678",
-            email: "alice.chen@truefull.com.tw",
-            avatar: ""
-        };
-
-        // 豐富填滿的 9 月份行程資料 (一到五四天有 2-3 個行程)
-        let schedules = [
-            // 9/1 (二)
-            { id: 101, date: '2026-09-01', time: '09:00 - 10:30', title: '週會 - 高階管理層週報', location: '總部 10 樓大會議室', content: '各部門 KPI 匯報與建案進度追蹤。', remark: '需準備專案PPT' },
-            { id: 102, date: '2026-09-01', time: '12:00 - 14:00', title: '餐敘 - 與竹縣建設局長午餐', location: '喜來登飯店采悅軒', content: '交流竹北新開發區都市計畫變更細節。', remark: '主管指定帶樹海建案簡冊' },
-            { id: 103, date: '2026-09-01', time: '15:30 - 17:00', title: '出差 - 竹風樹海二期案場視察', location: '竹北高鐵特區案場', content: '督導工地安全與樣品屋裝修進度。', remark: '安全帽與工地鞋已備妥' },
-
-            // 9/2 (三)
-            { id: 104, date: '2026-09-02', time: '10:00 - 11:30', title: '會議 - 銀行團聯貸案簡報', location: '兆豐銀行總行', content: '簡報竹北二期 20 億聯貸資金規畫。', remark: '財務長同行' },
-            { id: 105, date: '2026-09-02', time: '14:00 - 16:00', title: '拜訪 - 合作建築師事務所', location: '李建築師事務所', content: '討論三期外觀綠建築標章設計圖。', remark: '確認法規檢討報告' },
-
-            // 9/3 (四)
-            { id: 106, date: '2026-09-03', time: '09:30 - 11:00', title: '週會 - 營建部工程例會', location: '工務所 2 樓', content: '檢討水泥與鋼筋進場時程及品質抽驗。', remark: '現場工程師出席' },
-            { id: 107, date: '2026-09-03', time: '12:00 - 13:30', title: '餐敘 - 結構技師公會交流', location: '老爺酒店', content: '討論高層建築抗震結構新技術。', remark: '建立長期合作關係' },
-            { id: 108, date: '2026-09-03', time: '15:00 - 16:30', title: '會議 - 中秋公關禮品最後確認', location: '特助辦公室', content: '確認 VIP 客户禮品清單與卡片列印。', remark: '行政組協助辦理' },
-
-            // 9/4 (五)
-            { id: 109, date: '2026-09-04', time: '10:00 - 12:00', title: '會議 - 董事會前置預備會', location: '總部 8 樓第一會議室', content: '審閱 Q3 財務報表與開發案提案。', remark: '董事長親自主持' },
-            { id: 110, date: '2026-09-04', time: '18:30 - 21:00', title: '餐敘 - 竹科企業家俱樂部晚宴', location: '國賓大飯店', content: '擴展竹科高階買家網絡與品牌推廣。', remark: '攜帶名片 50 張' },
-
-            // 9/7 (一)
-            { id: 111, date: '2026-09-07', time: '09:00 - 10:30', title: '週會 - 晨間主管晨會', location: '總部簡報室', content: '本週重大事項追蹤與跨部門協調。', remark: '特助紀錄重點' },
-            { id: 112, date: '2026-09-07', time: '14:00 - 15:30', title: '出差 - 關西土地勘查', location: '新竹縣關西段土地', content: '實地勘查養生度假村預定地。', remark: '地政士隨行' },
-
-            // 9/8 (二)
-            { id: 113, date: '2026-09-08', time: '10:00 - 11:30', title: '會議 - 品牌行銷代理商評選', location: '簡報室 B', content: '聽取三家廣告公司提案簡報。', remark: '行銷部參與評分' },
-            { id: 114, date: '2026-09-08', time: '12:00 - 13:30', title: '餐敘 - 土地買方代表午宴', location: '東方軒', content: '商討關西土地合建分售細節。', remark: '初步意向書簽署' },
-            { id: 115, date: '2026-09-08', time: '16:00 - 17:30', title: '拜訪 - 市政府都市發展處', location: '新竹縣政府', content: '呈送都審變更申請文件。', remark: '備妥公文編號' },
-
-            // 9/9 (三)
-            { id: 116, date: '2026-09-09', time: '09:30 - 11:30', title: '會議 - ESG永續建築報告審核', location: '會議室 A', content: '審查竹風樹海碳足跡認證文件。', remark: '永續小組簡報' },
-            { id: 117, date: '2026-09-09', time: '14:00 - 16:00', title: '出差 - 苗栗頂級建案參訪', location: '苗栗指標建案', content: '考察頂級會所與公設營運模式。', remark: '研發團隊同前往' },
-
-            // 9/10 (四)
-            { id: 118, date: '2026-09-10', time: '10:00 - 11:30', title: '週會 - 工務與安全衛生評鑑', location: '工務總部', content: '針對 Q3 各案場工安進行總體檢。', remark: '頒發零災害獎勵' },
-            { id: 119, date: '2026-09-10', time: '12:00 - 14:00', title: '餐敘 - 法律顧問定期餐會', location: '和江日本料理', content: '討論近期合約條款與產權登記爭議。', remark: '法務主管同席' },
-
-            // 9/11 (五)
-            { id: 120, date: '2026-09-11', time: '09:00 - 12:00', title: '會議 - Q3 董事會正式會議', location: '總部 12 樓董事會廳', content: '決議重大投資案與半年度股利分派。', remark: '備齊表決票與會議記錄' },
-            { id: 121, date: '2026-09-11', time: '14:30 - 16:00', title: '拜訪 - VIP客戶家族辦公室', location: '竹北高鐵特區', content: '說明專屬頂層豪宅客製化變更方案。', remark: '設計總監隨行' },
-            { id: 122, date: '2026-09-11', time: '18:00 - 20:30', title: '餐敘 - 董事會感恩晚宴', location: '新竹國賓飯店', content: '感謝全體董事對集團發展之支持。', remark: '特助負責席次安排' },
-
-            // 9/14 (一)
-            { id: 123, date: '2026-09-14', time: '09:00 - 10:30', title: '週會 - 週一經營小組會議', location: '主管辦公室', content: '董事會決議事項交辦與執行管考。', remark: '列管事項產出' },
-            { id: 124, date: '2026-09-14', time: '13:30 - 15:00', title: '會議 - 景觀園藝設計審查', location: '會議室 C', content: '確定樹海二期中庭水景與植栽品種。', remark: '景觀公司簡報' },
-
-            // 9/15 (二)
-            { id: 125, date: '2026-09-15', time: '10:00 - 11:30', title: '會議 - 智慧住宅系統採購簽約', location: '簡報室 A', content: '與台達電簽署智慧社區管理系統合約。', remark: '新聞稿同步發布' },
-            { id: 126, date: '2026-09-15', time: '12:00 - 13:30', title: '餐敘 - 媒體高層午宴', location: '吉品海鮮', content: '交流建設業展望與新聞公關佈局。', remark: '準備公關禮品' },
-            { id: 127, date: '2026-09-15', time: '15:00 - 17:00', title: '出差 - 台中旗艦展示中心視察', location: '台中接待中心', content: '檢查接待會館試營運籌備狀況。', remark: '專車接送' },
-
-            // 9/16 (三)
-            { id: 128, date: '2026-09-16', time: '09:30 - 11:00', title: '週會 - 財務現金流預測評估', location: '財務部會議室', content: '評估年底前建案交屋尾款回收狀況。', remark: '財務長主持' },
-            { id: 129, date: '2026-09-16', time: '14:00 - 16:00', title: '拜訪 - 鋼鐵材料大廠董事長', location: '高雄中鋼總部', content: '洽談未來兩年結構鋼材長期供應合約。', remark: '搭乘高鐵往返' },
-
-            // 9/17 (四)
-            { id: 130, date: '2026-09-17', time: '10:00 - 11:30', title: '會議 - 數位轉型與ERP系統升級', location: '資訊部簡報室', content: '聽取 Oracle 系統導入期中報告。', remark: '測試環境展示' },
-            { id: 131, date: '2026-09-17', time: '12:00 - 13:30', title: '餐敘 - 產學合作教授午宴', location: '交大竹楓餐廳', content: '研討新竹營建自動化人才培育計畫。', remark: '簽署合作意向書' },
-
-            // 9/18 (五)
-            { id: 132, date: '2026-09-18', time: '09:00 - 10:30', title: '週會 - 全公司安全生產會', location: '大禮堂', content: '頒發安全優良案場標竿獎。', remark: '全體工務人員參加' },
-            { id: 133, date: '2026-09-18', time: '11:00 - 12:30', title: '會議 - 中秋節員工福利簽核', location: '主管辦公室', content: '審定中秋禮金與獎金發放規模。', remark: 'HR主管會簽' },
-            { id: 134, date: '2026-09-18', time: '15:00 - 17:00', title: '拜訪 - 新竹縣商業會理事長', location: '商業會館', content: '邀請擔任企業社會責任顧問。', remark: '攜送特選名茶' },
-
-            // 9/21 (一)
-            { id: 135, date: '2026-09-21', time: '09:00 - 10:30', title: '週會 - 營運管理會議', location: '會議室 A', content: '管考各建案進度與預算執行率。', remark: '產出管制燈號' },
-            { id: 136, date: '2026-09-21', time: '14:00 - 16:00', title: '會議 - 關西養生村概念規劃', location: '研發部討論室', content: '評估溫泉泉質與健康管理服務引進。', remark: '醫療團隊參與' },
-
-            // 9/22 (二)
-            { id: 137, date: '2026-09-22', time: '10:00 - 11:30', title: '拜訪 - 環評委員預備會', location: '環境影響評估中心', content: '說明水資源回收與綠化率指標。', remark: '顧問公司報告' },
-            { id: 138, date: '2026-09-22', time: '12:00 - 13:30', title: '餐敘 - 建築師協會理事長餐會', location: '煙波大飯店', content: '交流最新建築法規修正趨勢。', remark: '交流備忘錄' },
-
-            // 9/23 (三)
-            { id: 139, date: '2026-09-23', time: '09:30 - 11:30', title: '會議 - 物業管理服務升級會', location: '簡報室 B', content: '檢討豪宅物業引進酒店式服務標準。', remark: '物業總經理出席' },
-            { id: 140, date: '2026-09-23', time: '14:00 - 15:30', title: '出差 - 台北信義區總部辦公室預定地', location: '台北信義區', content: '考察台北聯絡處辦公室選址。', remark: '房產仲介陪同' },
-
-            // 9/24 (四)
-            { id: 141, date: '2026-09-24', time: '10:00 - 11:30', title: '週會 - 品質管理審查會', location: '品質部', content: '審查防水工程驗收標準與改善案。', remark: '品管主管報告' },
-            { id: 142, date: '2026-09-24', time: '15:00 - 16:30', title: '拜訪 - 新竹地方企業領袖', location: '聯發科總部', content: '簡報VIP專屬團購優惠方案。', remark: '行銷總監同前往' },
-
-            // 9/25 (五)
-            { id: 143, date: '2026-09-25', time: '09:00 - 11:00', title: '會議 - 10月份重大行程排定', location: '特助辦公室', content: '與主管確認第四季出差與大型活動。', remark: '特助主辦' },
-            { id: 144, date: '2026-09-25', time: '12:00 - 14:00', title: '餐敘 - 中秋節前夕主管聚餐', location: '頂級鐵板燒', content: '慰勞各部門主管近半年辛勞。', remark: '訂位完成' },
-
-            // 9/28 (一)
-            { id: 145, date: '2026-09-28', time: '09:00 - 10:30', title: '週會 - 營運管理週會', location: '會議室 A', content: '追蹤節前各工地留守與安全防護。', remark: '工安重點提醒' },
-            { id: 146, date: '2026-09-28', time: '14:00 - 15:30', title: '會議 - 門禁智慧化設備評選', location: '資訊部', content: '評估人臉辨識與智慧門鎖供應商。', remark: '展示樣品測試' },
-
-            // 9/29 (二)
-            { id: 147, date: '2026-09-29', time: '10:00 - 11:30', title: '拜訪 - 縣議員服務處', location: '竹北服務處', content: '溝通周邊道路拓寬與綠美化合作。', remark: '公關組備妥簡報' },
-            { id: 148, date: '2026-09-29', time: '12:00 - 13:30', title: '餐敘 - 結構設計師午宴', location: '鼎泰豐', content: '討論三期抗震等級提升至7級細節。', remark: '技師提出報告' },
-
-            // 9/30 (三)
-            { id: 149, date: '2026-09-30', time: '09:30 - 11:30', title: '會議 - Q3 經營績效結算預備會', location: '財務部', content: '核對九月營收與各專案預算結餘。', remark: '會計師列席' },
-            { id: 150, date: '2026-09-30', time: '14:00 - 16:00', title: '出差 - 竹風樹海案場連假安檢', location: '竹北樹海案場', content: '連假前巡檢工地防風防雨設施。', remark: '工務長陪同' }
-        ];
-
-        // 簽核任務資料 (專案名稱、檢視與編輯按鈕)
-        let tasks = [
-            { id: 1, name: '竹風樹海二期 20 億元工程聯貸簽核案', category: '工程採購案', unit: '財務部', owner: '張經理', deadline: '2026-09-18', status: '審核中', desc: '向兆豐銀行申請 20 億元建造貸款，利率 2.15%，請董事長簽核授權。' },
-            { id: 2, name: '關西溫泉養生村土地變更計畫書', category: '土地開發案', unit: '土地開發部', owner: '王副理', deadline: '2026-09-25', status: '需修正', desc: '縣府要求補充水土保持與山坡地開發審查報告。' },
-            { id: 3, name: '2026 中秋節 VIP 尊榮賀禮採購案', category: '行政管理', unit: '特助辦公室', owner: 'Alice Chen', deadline: '2026-09-10', status: '已核准', desc: '採購鼎泰豐與特選高山茶禮盒共 120 份。' }
-        ];
-
-        // 專案進度資料 (檢視與編輯、附件檔案)
-        let projects = [
-            { id: 1, title: '竹北「竹風樹海」二期豪宅建案', category: '營建工程', progress: 65, owner: '陳總監', desc: '主體結構已升至 18 樓，樣品屋開放預約賞屋，預計 2027 Q2 完工。', files: '建築執照.pdf, 18樓結構驗收單.png, 樣品屋導覽手冊.pdf' },
-            { id: 2, title: '關西頂級養生度假村開發案', category: '土地開發', progress: 30, owner: '林副總', desc: '完成溫泉泉質認證，正進行水土保持計劃審查與綠建築標章申請。', files: '溫泉水質檢驗報告.pdf, 地形測量圖.dwg' },
-            { id: 3, title: '竹風總部大樓智慧化與ESG綠建築升級', category: '集團行政', progress: 85, owner: '黃經理', desc: '頂樓太陽能板已安裝完畢，智慧門禁與能源管理系統測試中。', files: 'ESG能源評估報告.xlsx, 太陽能設備合約.pdf' }
-        ];
-
-        // 名片資料 (含大頭照、喜好偏好、上次見面時間、認識地點)
-        let contacts = [
-            {
-                id: 1,
-                name: '張世傑',
-                company: '兆豐國際商業銀行 新竹分行',
-                title: '資深副總經理',
-                phone: '0933-112-233',
-                email: 'sj.chang@megabank.com.tw',
-                photo: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150',
-                preference: '喜愛單一麥芽威士忌、偏好無麩質飲食、熱愛打高爾夫球',
-                lastMeet: '2026-09-02',
-                meetPlace: '兆豐銀行總行 聯貸會議室',
-                remark: '建設公司重要融資合作夥伴，每逢三大節日需親自拜訪。'
-            },
-            {
-                id: 2,
-                name: '李國華',
-                company: '李國華建築師事務所',
-                title: '主持建築師',
-                phone: '0910-888-999',
-                email: 'kh.lee@architects.com.tw',
-                photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-                preference: '愛喝手沖單品咖啡 (耶加雪菲)、喜歡收藏當代藝術畫作',
-                lastMeet: '2026-09-02',
-                meetPlace: '李建築師事務所 台北會務所',
-                remark: '主導竹風樹海二期外觀設計，對建築細節要求極高。'
-            },
-            {
-                id: 3,
-                name: '林美玲',
-                company: '新竹縣政府 都市發展處',
-                title: '副處長',
-                phone: '0922-555-777',
-                email: 'meiling.lin@hsinchu.gov.tw',
-                photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150',
-                preference: '喜歡素食蔬食料理、熱心公益、不喝含糖飲料',
-                lastMeet: '2026-08-15',
-                meetPlace: '新竹縣政府 都審會會議室',
-                remark: '溝通都市更新與都審案件之重要縣府窗口。'
-            }
-        ];
-
-        // 節慶送禮規劃 (對象姓名、備註)
-        let gifts = [
-            { id: 1, festival: '中秋節', target: '張世傑 副總 (兆豐銀行)', item: '鼎泰豐尊爵月餅 + 特級高山烏龍茶', amount: 3800, date: '2026-09-15', status: '準備中', remark: '附專屬手寫賀卡，指定配送至分行。' },
-            { id: 2, festival: '中秋節', target: '李國華 建築師', item: '法式精緻糕點禮盒 + 頂級精品咖啡豆', amount: 2600, date: '2026-09-16', status: '準備中', remark: '寄送至台北事務所，感謝設計付出。' },
-            { id: 3, festival: '公關拜訪', target: '林美玲 副處長', item: '有機高山有機蔬果禮籃', amount: 1800, date: '2026-09-18', status: '已送達', remark: '配合個人喜好挑選有機蔬果，已順利簽收。' }
-        ];
-
-        let savedNotes = [
-            { id: 1, title: '樹海二期工程會議備忘', content: '鋼筋進場需於每週二前完成抽驗，樣品屋空調系統於本週四點交。' },
-            { id: 2, title: '董事長交辦重點', content: '與兆豐銀行聯貸案務必於本月中完成簽核，關西養生村環評資料需補充。' }
-        ];
-
-
-        // === 初始化頁面 ===
-        window.onload = function() {
-            updateClock();
-            setInterval(updateClock, 1000);
-
-            renderCalendar();
-            renderTasks();
-            renderProjects();
-            renderContacts();
-            renderGifts();
-            renderSavedNotes();
-
-            initDrawingCanvas();
-        };
-
-        // 時鐘更新
-        function updateClock() {
-            const now = new Date();
-            const days = ['日', '一', '二', '三', '四', '五', '六'];
-            document.getElementById('clock-date').innerText = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} (${days[now.getDay()]})`;
-            document.getElementById('clock-time').innerText = now.toTimeString().split(' ')[0];
+        if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+          currentStatus = item.status;
+          statusColor = item.color;
+          break;
         }
-
-        // 切換 Tab
-        function switchTab(tabName) {
-            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-[#5599FF]', 'text-white', 'shadow');
-                btn.classList.add('text-[#007799]');
-            });
-            const activeBtn = document.getElementById(`btn-${tabName}`);
-            if (activeBtn) {
-                activeBtn.classList.remove('text-[#007799]');
-                activeBtn.classList.add('bg-[#5599FF]', 'text-white', 'shadow');
-            }
-        }
-
-
-        // === 1. 行事曆邏輯 (萬年曆顯示事件標題，九月填滿) ===
-        function renderCalendar() {
-            const monthDisplay = document.getElementById('calendar-month-year-display');
-            monthDisplay.innerText = `${currentYear} 年 ${String(currentMonth + 1).padStart(2, '0')} 月`;
-
-            const daysGrid = document.getElementById('calendar-days-grid');
-            daysGrid.innerHTML = '';
-
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-            // 填充前置空白
-            for (let i = 0; i < firstDay; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.className = "h-24 bg-white/20 rounded-xl border border-transparent";
-                daysGrid.appendChild(emptyCell);
-            }
-
-            // 填充天數
-            for (let day = 1; day <= totalDays; day++) {
-                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const daySchedules = schedules.filter(s => s.date === dateStr);
-
-                const dayCell = document.createElement('div');
-                const isSelected = (dateStr === selectedDateStr);
-
-                dayCell.className = `h-24 p-1.5 rounded-xl border transition cursor-pointer flex flex-col justify-between text-left overflow-hidden ${
-                    isSelected ? 'bg-[#CCDDFF] border-[#5599FF] ring-2 ring-[#5599FF]' : 'bg-white/70 border-[#99BBFF]/50 hover:bg-white/90'
-                }`;
-                dayCell.onclick = () => selectCalendarDate(dateStr);
-
-                // 天數號碼
-                let dayNumHtml = `<span class="font-bold-custom text-xs text-[#007799]">${day}</span>`;
-                
-                // 行程標題事件清單 (簡短顯示 1~2 個)
-                let eventsHtml = '';
-                if (daySchedules.length > 0) {
-                    eventsHtml = `<div class="space-y-1 overflow-hidden my-0.5">`;
-                    daySchedules.slice(0, 2).forEach(s => {
-                        eventsHtml += `
-                            <div class="text-[10px] bg-[#5599FF]/20 text-[#007799] px-1 py-0.5 rounded truncate font-medium-custom border border-[#5599FF]/30" title="${s.title}">
-                                ${s.time.split('-')[0].trim()} ${s.title}
-                            </div>
-                        `;
-                    });
-                    if (daySchedules.length > 2) {
-                        eventsHtml += `<div class="text-[9px] text-[#0088A8] font-bold-custom text-right">+${daySchedules.length - 2} 更多</div>`;
-                    }
-                    eventsHtml += `</div>`;
-                } else {
-                    eventsHtml = `<div class="text-[10px] text-slate-400 italic">無行程</div>`;
-                }
-
-                dayCell.innerHTML = `
-                    <div class="flex justify-between items-center">${dayNumHtml} ${daySchedules.length > 0 ? `<span class="w-1.5 h-1.5 rounded-full bg-[#5599FF]"></span>` : ''}</div>
-                    ${eventsHtml}
-                `;
-
-                daysGrid.appendChild(dayCell);
-            }
-
-            renderDayScheduleList();
-        }
-
-        function changeMonth(delta) {
-            currentMonth += delta;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            } else if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            // 預設選取當月1號
-            selectedDateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`;
-            renderCalendar();
-        }
-
-        function selectCalendarDate(dateStr) {
-            selectedDateStr = dateStr;
-            renderCalendar();
-        }
-
-        function renderDayScheduleList() {
-            document.getElementById('selected-date-badge').innerText = selectedDateStr;
-            const container = document.getElementById('selected-day-schedule-list');
-            container.innerHTML = '';
-
-            const dayList = schedules.filter(s => s.date === selectedDateStr);
-
-            if (dayList.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-400 text-sm">今日尚無排定行程，點擊右上角按鈕即可新增。</div>`;
-                return;
-            }
-
-            dayList.forEach(s => {
-                const item = document.createElement('div');
-                item.className = "bg-white/90 p-4 rounded-xl border border-[#99BBFF] shadow-sm hover:shadow-md transition flex items-center justify-between cursor-pointer";
-                item.onclick = (e) => {
-                    // 若不是點擊編輯/刪除按鈕，開啟詳細檢視
-                    if (!e.target.closest('button')) {
-                        viewScheduleDetail(s.id);
-                    }
-                };
-
-                item.innerHTML = `
-                    <div class="flex items-start gap-4">
-                        <div class="bg-[#CCDDFF] text-[#007799] px-3 py-1.5 rounded-lg font-mono text-xs text-center shrink-0 border border-[#99BBFF]">
-                            <i class="fa-regular fa-clock block text-sm mb-0.5 text-[#5599FF]"></i>
-                            ${s.time}
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h4 class="font-medium-custom text-base text-[#007799]">${s.title}</h4>
-                                <span class="text-xs bg-[#5599FF]/20 text-[#007799] px-2 py-0.5 rounded border border-[#5599FF]/30"><i class="fa-solid fa-location-dot mr-1"></i>${s.location}</span>
-                            </div>
-                            <p class="text-xs text-[#0088A8] mt-1">${s.content}</p>
-                            ${s.remark ? `<p class="text-xs text-[#00AAAA] mt-0.5"><i class="fa-solid fa-note-sticky mr-1"></i>備註：${s.remark}</p>` : ''}
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="editSchedule(${s.id})" class="px-3 py-1.5 bg-[#5599FF] text-white text-xs rounded-lg hover:bg-[#9999FF] transition"><i class="fa-solid fa-pen-to-square"></i> 編輯</button>
-                        <button onclick="deleteSchedule(${s.id})" class="px-3 py-1.5 bg-[#FF8888] text-white text-xs rounded-lg hover:bg-red-400 transition"><i class="fa-solid fa-trash"></i> 刪除</button>
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function viewScheduleDetail(id) {
-            const s = schedules.find(item => item.id === id);
-            if (!s) return;
-            document.getElementById('detail-modal-title').innerText = `行程詳細內容 - ${s.title}`;
-            document.getElementById('detail-modal-body').innerHTML = `
-                <div class="space-y-3 bg-[#CCDDFF]/20 p-4 rounded-xl border border-[#99BBFF]">
-                    <p><strong class="text-[#0088A8]">日期：</strong> ${s.date}</p>
-                    <p><strong class="text-[#0088A8]">時間：</strong> ${s.time}</p>
-                    <p><strong class="text-[#0088A8]">行程標題：</strong> ${s.title}</p>
-                    <p><strong class="text-[#0088A8]">地點：</strong> ${s.location}</p>
-                    <p><strong class="text-[#0088A8]">詳細內容：</strong> ${s.content}</p>
-                    <p><strong class="text-[#0088A8]">備註說明：</strong> ${s.remark || '無'}</p>
-                </div>
-            `;
-            openModal('modal-detail-view');
-        }
-
-        function openScheduleModal() {
-            editingSchedId = null;
-            document.getElementById('sched-modal-title').innerText = "排定主管行程";
-            document.getElementById('sched-date').value = selectedDateStr;
-            document.getElementById('sched-time').value = "10:00 - 11:30";
-            document.getElementById('sched-title').value = "";
-            document.getElementById('sched-location').value = "";
-            document.getElementById('sched-content').value = "";
-            document.getElementById('sched-remark').value = "";
-            openModal('modal-schedule');
-        }
-
-        function editSchedule(id) {
-            editingSchedId = id;
-            const s = schedules.find(item => item.id === id);
-            if (!s) return;
-
-            document.getElementById('sched-modal-title').innerText = "編輯主管行程";
-            document.getElementById('sched-date').value = s.date;
-            document.getElementById('sched-time').value = s.time;
-            document.getElementById('sched-title').value = s.title;
-            document.getElementById('sched-location').value = s.location;
-            document.getElementById('sched-content').value = s.content;
-            document.getElementById('sched-remark').value = s.remark || "";
-            openModal('modal-schedule');
-        }
-
-        function saveSchedule() {
-            const date = document.getElementById('sched-date').value;
-            const time = document.getElementById('sched-time').value;
-            const title = document.getElementById('sched-title').value.trim();
-            const location = document.getElementById('sched-location').value.trim();
-            const content = document.getElementById('sched-content').value.trim();
-            const remark = document.getElementById('sched-remark').value.trim();
-
-            if (!date || !title) {
-                alert('請填寫日期與行程標題！');
-                return;
-            }
-
-            if (editingSchedId) {
-                const s = schedules.find(item => item.id === editingSchedId);
-                if (s) {
-                    s.date = date; s.time = time; s.title = title;
-                    s.location = location; s.content = content; s.remark = remark;
-                }
-            } else {
-                schedules.push({
-                    id: Date.now(),
-                    date, time, title, location, content, remark
-                });
-            }
-
-            closeModal('modal-schedule');
-            selectedDateStr = date;
-            renderCalendar();
-        }
-
-        function deleteSchedule(id) {
-            if (confirm('確定要刪除此行程嗎？')) {
-                schedules = schedules.filter(s => s.id !== id);
-                renderCalendar();
-            }
-        }
-
-
-        // === 2. 簽核與決議追蹤邏輯 ===
-        function renderTasks() {
-            const tbody = document.getElementById('task-table-body');
-            tbody.innerHTML = '';
-
-            tasks.forEach(t => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-white/60 transition";
-
-                let statusBadge = '';
-                if (t.status === '已核准') statusBadge = `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium-custom"><i class="fa-solid fa-circle-check mr-1"></i>已核准</span>`;
-                else if (t.status === '審核中') statusBadge = `<span class="bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full text-xs font-medium-custom"><i class="fa-solid fa-clock mr-1"></i>審核中</span>`;
-                else statusBadge = `<span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full text-xs font-medium-custom"><i class="fa-solid fa-triangle-exclamation mr-1"></i>需修正</span>`;
-
-                tr.innerHTML = `
-                    <td class="p-3.5 font-medium-custom text-base text-[#007799]">${t.name}</td>
-                    <td class="p-3.5"><span class="bg-[#CCDDFF] text-[#007799] px-2.5 py-1 rounded-lg text-xs">${t.category}</span></td>
-                    <td class="p-3.5">${t.unit}</td>
-                    <td class="p-3.5">${t.owner}</td>
-                    <td class="p-3.5 font-mono text-xs">${t.deadline}</td>
-                    <td class="p-3.5">${statusBadge}</td>
-                    <td class="p-3.5 text-center space-x-1.5">
-                        <button onclick="viewTaskDetail(${t.id})" class="px-3 py-1 bg-[#00AAAA] text-white rounded-lg hover:bg-[#0088A8] transition"><i class="fa-solid fa-eye"></i> 檢視</button>
-                        <button onclick="editTask(${t.id})" class="px-3 py-1 bg-[#5599FF] text-white rounded-lg hover:bg-[#9999FF] transition"><i class="fa-solid fa-pen-to-square"></i> 編輯</button>
-                        <button onclick="deleteTask(${t.id})" class="px-3 py-1 bg-[#FF8888] text-white rounded-lg hover:bg-red-400 transition"><i class="fa-solid fa-trash"></i> 刪除</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            document.getElementById('kpi-task-count').innerText = `${tasks.filter(t=>t.status!=='已核准').length} 件待辦`;
-        }
-
-        function viewTaskDetail(id) {
-            const t = tasks.find(item => item.id === id);
-            if (!t) return;
-            document.getElementById('detail-modal-title').innerText = `簽核任務詳情 - ${t.name}`;
-            document.getElementById('detail-modal-body').innerHTML = `
-                <div class="space-y-3 bg-[#CCDDFF]/20 p-4 rounded-xl border border-[#99BBFF]">
-                    <p><strong class="text-[#0088A8]">專案名稱：</strong> ${t.name}</p>
-                    <p><strong class="text-[#0088A8]">任務分類：</strong> ${t.category}</p>
-                    <p><strong class="text-[#0088A8]">呈送單位：</strong> ${t.unit}</p>
-                    <p><strong class="text-[#0088A8]">負責人：</strong> ${t.owner}</p>
-                    <p><strong class="text-[#0088A8]">截止日期：</strong> ${t.deadline}</p>
-                    <p><strong class="text-[#0088A8]">簽核狀態：</strong> ${t.status}</p>
-                    <p><strong class="text-[#0088A8]">摘要說明：</strong> ${t.desc}</p>
-                </div>
-            `;
-            openModal('modal-detail-view');
-        }
-
-        function openTaskModal() {
-            editingTaskId = null;
-            document.getElementById('task-modal-title').innerText = "呈送簽核任務";
-            document.getElementById('task-name').value = "";
-            document.getElementById('task-unit').value = "";
-            document.getElementById('task-owner').value = "";
-            document.getElementById('task-deadline').value = "";
-            document.getElementById('task-desc').value = "";
-            openModal('modal-task');
-        }
-
-        function editTask(id) {
-            editingTaskId = id;
-            const t = tasks.find(item => item.id === id);
-            if (!t) return;
-
-            document.getElementById('task-modal-title').innerText = "編輯簽核任務";
-            document.getElementById('task-name').value = t.name;
-            document.getElementById('task-category').value = t.category;
-            document.getElementById('task-unit').value = t.unit;
-            document.getElementById('task-owner').value = t.owner;
-            document.getElementById('task-deadline').value = t.deadline;
-            document.getElementById('task-status').value = t.status;
-            document.getElementById('task-desc').value = t.desc;
-            openModal('modal-task');
-        }
-
-        function saveTask() {
-            const name = document.getElementById('task-name').value.trim();
-            const category = document.getElementById('task-category').value;
-            const unit = document.getElementById('task-unit').value.trim();
-            const owner = document.getElementById('task-owner').value.trim();
-            const deadline = document.getElementById('task-deadline').value;
-            const status = document.getElementById('task-status').value;
-            const desc = document.getElementById('task-desc').value.trim();
-
-            if (!name) { alert('請填寫專案名稱！'); return; }
-
-            if (editingTaskId) {
-                const t = tasks.find(item => item.id === editingTaskId);
-                if (t) {
-                    t.name = name; t.category = category; t.unit = unit;
-                    t.owner = owner; t.deadline = deadline; t.status = status; t.desc = desc;
-                }
-            } else {
-                tasks.push({ id: Date.now(), name, category, unit, owner, deadline, status, desc });
-            }
-
-            closeModal('modal-task');
-            renderTasks();
-        }
-
-        function deleteTask(id) {
-            if (confirm('確定刪除此簽核任務？')) {
-                tasks = tasks.filter(t => t.id !== id);
-                renderTasks();
-            }
-        }
-
-
-        // === 3. 專案進度邏輯 (檢視、編輯、附件) ===
-        function renderProjects() {
-            const container = document.getElementById('projects-container');
-            container.innerHTML = '';
-
-            projects.forEach(p => {
-                const card = document.createElement('div');
-                card.className = "bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm hover:shadow-md transition space-y-4 cursor-pointer";
-                card.onclick = (e) => {
-                    if (!e.target.closest('button')) viewProjectDetail(p.id);
-                };
-
-                const fileList = p.files ? p.files.split(',').map(f => `<span class="inline-flex items-center gap-1 bg-[#CCDDFF]/60 px-2.5 py-1 rounded text-xs text-[#007799] border border-[#99BBFF]/40"><i class="fa-solid fa-paperclip"></i> ${f.trim()}</span>`).join(' ') : '無附件';
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="bg-[#5599FF] text-white px-2.5 py-0.5 rounded text-xs font-medium-custom">${p.category}</span>
-                            <h3 class="font-medium-custom text-lg text-[#007799] mt-2">${p.title}</h3>
-                            <p class="text-xs text-[#0088A8] mt-1"><i class="fa-solid fa-user-gear mr-1"></i>負責人：${p.owner}</p>
-                        </div>
-                        <div class="flex gap-1.5">
-                            <button onclick="viewProjectDetail(${p.id})" class="px-3 py-1 bg-[#00AAAA] text-white text-xs rounded-lg hover:bg-[#0088A8] transition"><i class="fa-solid fa-eye"></i> 檢視</button>
-                            <button onclick="editProject(${p.id})" class="px-3 py-1 bg-[#5599FF] text-white text-xs rounded-lg hover:bg-[#9999FF] transition"><i class="fa-solid fa-pen-to-square"></i> 編輯</button>
-                            <button onclick="deleteProject(${p.id})" class="px-3 py-1 bg-[#FF8888] text-white text-xs rounded-lg hover:bg-red-400 transition"><i class="fa-solid fa-trash"></i> 刪除</button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between text-xs text-[#007799] mb-1 font-medium-custom">
-                            <span>專案整體進度</span>
-                            <span>${p.progress}%</span>
-                        </div>
-                        <div class="w-full bg-[#CCDDFF] rounded-full h-3 overflow-hidden">
-                            <div class="bg-[#5599FF] h-3 rounded-full transition-all duration-500" style="width: ${p.progress}%"></div>
-                        </div>
-                    </div>
-
-                    <p class="text-xs text-[#0088A8] line-clamp-2">${p.desc}</p>
-
-                    <div class="pt-2 border-t border-[#99BBFF]/40 flex flex-wrap gap-1.5 items-center">
-                        <span class="text-xs text-[#0088A8] font-medium-custom">附件檔案：</span>
-                        ${fileList}
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-
-            document.getElementById('kpi-project-count').innerText = `${projects.length} 項專案`;
-        }
-
-        function viewProjectDetail(id) {
-            const p = projects.find(item => item.id === id);
-            if (!p) return;
-
-            const fileList = p.files ? p.files.split(',').map(f => `<div class="p-2 bg-white rounded border border-[#99BBFF] text-xs flex items-center justify-between"><span class="flex items-center gap-2"><i class="fa-solid fa-file-pdf text-[#5599FF]"></i> ${f.trim()}</span><button onclick="alert('模擬下載附件：${f.trim()}')" class="text-[#5599FF] hover:underline">下載</button></div>`).join('') : '無';
-
-            document.getElementById('detail-modal-title').innerText = `專案詳細內容 - ${p.title}`;
-            document.getElementById('detail-modal-body').innerHTML = `
-                <div class="space-y-4 bg-[#CCDDFF]/20 p-4 rounded-xl border border-[#99BBFF]">
-                    <div class="flex justify-between items-center">
-                        <span class="bg-[#5599FF] text-white px-2.5 py-1 rounded text-xs">${p.category}</span>
-                        <span class="text-sm font-bold-custom text-[#007799]">進度：${p.progress}%</span>
-                    </div>
-                    <p><strong class="text-[#0088A8]">專案名稱：</strong> ${p.title}</p>
-                    <p><strong class="text-[#0088A8]">專案負責人：</strong> ${p.owner}</p>
-                    <p><strong class="text-[#0088A8]">詳細說明：</strong> ${p.desc}</p>
-                    <div>
-                        <strong class="text-[#0088A8] block mb-2">專案附件列表：</strong>
-                        <div class="space-y-2">${fileList}</div>
-                    </div>
-                </div>
-            `;
-            openModal('modal-detail-view');
-        }
-
-        function openProjectModal() {
-            editingProjId = null;
-            document.getElementById('proj-modal-title').innerText = "新增專案";
-            document.getElementById('proj-title').value = "";
-            document.getElementById('proj-progress').value = "0";
-            document.getElementById('proj-owner').value = "";
-            document.getElementById('proj-desc').value = "";
-            document.getElementById('proj-files').value = "";
-            openModal('modal-project');
-        }
-
-        function editProject(id) {
-            editingProjId = id;
-            const p = projects.find(item => item.id === id);
-            if (!p) return;
-
-            document.getElementById('proj-modal-title').innerText = "編輯專案進度";
-            document.getElementById('proj-title').value = p.title;
-            document.getElementById('proj-category').value = p.category;
-            document.getElementById('proj-progress').value = p.progress;
-            document.getElementById('proj-owner').value = p.owner;
-            document.getElementById('proj-desc').value = p.desc;
-            document.getElementById('proj-files').value = p.files || "";
-            openModal('modal-project');
-        }
-
-        function saveProject() {
-            const title = document.getElementById('proj-title').value.trim();
-            const category = document.getElementById('proj-category').value;
-            const progress = parseInt(document.getElementById('proj-progress').value) || 0;
-            const owner = document.getElementById('proj-owner').value.trim();
-            const desc = document.getElementById('proj-desc').value.trim();
-            const files = document.getElementById('proj-files').value.trim();
-
-            if (!title) { alert('請填寫專案名稱！'); return; }
-
-            if (editingProjId) {
-                const p = projects.find(item => item.id === editingProjId);
-                if (p) {
-                    p.title = title; p.category = category; p.progress = progress;
-                    p.owner = owner; p.desc = desc; p.files = files;
-                }
-            } else {
-                projects.push({ id: Date.now(), title, category, progress, owner, desc, files });
-            }
-
-            closeModal('modal-project');
-            renderProjects();
-        }
-
-        function deleteProject(id) {
-            if (confirm('確定要刪除此專案？')) {
-                projects = projects.filter(p => p.id !== id);
-                renderProjects();
-            }
-        }
-
-
-        // === 4. 名片資料邏輯 (大頭照、喜好偏好、上次見面、認識地點) ===
-        function renderContacts() {
-            const query = document.getElementById('contactSearch') ? document.getElementById('contactSearch').value.toLowerCase() : '';
-            const container = document.getElementById('contacts-container');
-            container.innerHTML = '';
-
-            const filtered = contacts.filter(c => 
-                c.name.toLowerCase().includes(query) ||
-                c.company.toLowerCase().includes(query) ||
-                c.phone.includes(query) ||
-                (c.preference && c.preference.toLowerCase().includes(query)) ||
-                (c.meetPlace && c.meetPlace.toLowerCase().includes(query))
-            );
-
-            filtered.forEach(c => {
-                const card = document.createElement('div');
-                card.className = "bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm hover:shadow-md transition space-y-3 cursor-pointer";
-                card.onclick = (e) => {
-                    if (!e.target.closest('button')) viewContactDetail(c.id);
-                };
-
-                const avatarHtml = c.photo ? `<img src="${c.photo}" class="w-14 h-14 rounded-full object-cover border-2 border-[#5599FF] shrink-0">` : `<div class="w-14 h-14 rounded-full bg-[#CCDDFF] border-2 border-[#5599FF] flex items-center justify-center text-[#007799] text-2xl font-bold-custom shrink-0"><i class="fa-solid fa-user"></i></div>`;
-
-                card.innerHTML = `
-                    <div class="flex items-start gap-4">
-                        ${avatarHtml}
-                        <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-medium-custom text-lg text-[#007799]">${c.name}</h3>
-                                    <p class="text-xs text-[#0088A8] font-medium-custom">${c.title}</p>
-                                </div>
-                                <div class="flex gap-1">
-                                    <button onclick="editContact(${c.id})" class="px-2.5 py-1 bg-[#5599FF] text-white text-xs rounded-lg hover:bg-[#9999FF] transition"><i class="fa-solid fa-pen-to-square"></i></button>
-                                    <button onclick="deleteContact(${c.id})" class="px-2.5 py-1 bg-[#FF8888] text-white text-xs rounded-lg hover:bg-red-400 transition"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                            <p class="text-xs text-[#007799] truncate mt-1"><i class="fa-solid fa-building mr-1"></i>${c.company}</p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1 text-xs text-[#0088A8] pt-2 border-t border-[#99BBFF]/40">
-                        <p><i class="fa-solid fa-phone w-4"></i> ${c.phone}</p>
-                        <p><i class="fa-solid fa-envelope w-4"></i> ${c.email}</p>
-                        ${c.preference ? `<p class="text-[#00AAAA] truncate"><i class="fa-solid fa-heart w-4"></i> 喜好：${c.preference}</p>` : ''}
-                        ${c.lastMeet ? `<p><i class="fa-solid fa-calendar-check w-4"></i> 上次見面：${c.lastMeet}</p>` : ''}
-                        ${c.meetPlace ? `<p class="truncate"><i class="fa-solid fa-location-dot w-4"></i> 認識地點：${c.meetPlace}</p>` : ''}
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function viewContactDetail(id) {
-            const c = contacts.find(item => item.id === id);
-            if (!c) return;
-
-            const avatarHtml = c.photo ? `<img src="${c.photo}" class="w-20 h-20 rounded-full object-cover border-2 border-[#5599FF] mx-auto">` : `<div class="w-20 h-20 rounded-full bg-[#CCDDFF] border-2 border-[#5599FF] flex items-center justify-center text-[#007799] text-3xl mx-auto"><i class="fa-solid fa-user"></i></div>`;
-
-            document.getElementById('detail-modal-title').innerText = `VIP 名片詳情 - ${c.name}`;
-            document.getElementById('detail-modal-body').innerHTML = `
-                <div class="space-y-4 bg-[#CCDDFF]/20 p-5 rounded-xl border border-[#99BBFF] text-center">
-                    ${avatarHtml}
-                    <div>
-                        <h3 class="text-xl font-bold-custom text-[#007799]">${c.name}</h3>
-                        <p class="text-sm text-[#0088A8]">${c.title} ｜ ${c.company}</p>
-                    </div>
-
-                    <div class="text-left space-y-2 text-xs text-[#007799] pt-3 border-t border-[#99BBFF]/50">
-                        <p><strong class="text-[#0088A8]">電話 / 手機：</strong> ${c.phone}</p>
-                        <p><strong class="text-[#0088A8]">Email 信箱：</strong> ${c.email}</p>
-                        <p><strong class="text-[#0088A8]">喜好與偏好：</strong> ${c.preference || '無紀錄'}</p>
-                        <p><strong class="text-[#0088A8]">上次見面時間：</strong> ${c.lastMeet || '無紀錄'}</p>
-                        <p><strong class="text-[#0088A8]">認識地點 / 場合：</strong> ${c.meetPlace || '無紀錄'}</p>
-                        <p><strong class="text-[#0088A8]">備註說明：</strong> ${c.remark || '無'}</p>
-                    </div>
-                </div>
-            `;
-            openModal('modal-detail-view');
-        }
-
-        function openContactModal() {
-            editingContactId = null;
-            document.getElementById('contact-modal-title').innerText = "新增 VIP 名片";
-            document.getElementById('card-photo').value = "";
-            document.getElementById('card-name').value = "";
-            document.getElementById('card-company').value = "";
-            document.getElementById('card-title').value = "";
-            document.getElementById('card-phone').value = "";
-            document.getElementById('card-email').value = "";
-            document.getElementById('card-preference').value = "";
-            document.getElementById('card-last-meet').value = "";
-            document.getElementById('card-meet-place').value = "";
-            document.getElementById('card-remark').value = "";
-            openModal('modal-contact');
-        }
-
-        function editContact(id) {
-            editingContactId = id;
-            const c = contacts.find(item => item.id === id);
-            if (!c) return;
-
-            document.getElementById('contact-modal-title').innerText = "編輯 VIP 名片";
-            document.getElementById('card-photo').value = c.photo || "";
-            document.getElementById('card-name').value = c.name;
-            document.getElementById('card-company').value = c.company;
-            document.getElementById('card-title').value = c.title;
-            document.getElementById('card-phone').value = c.phone;
-            document.getElementById('card-email').value = c.email;
-            document.getElementById('card-preference').value = c.preference || "";
-            document.getElementById('card-last-meet').value = c.lastMeet || "";
-            document.getElementById('card-meet-place').value = c.meetPlace || "";
-            document.getElementById('card-remark').value = c.remark || "";
-            openModal('modal-contact');
-        }
-
-        function saveContact() {
-            const photo = document.getElementById('card-photo').value.trim();
-            const name = document.getElementById('card-name').value.trim();
-            const company = document.getElementById('card-company').value.trim();
-            const title = document.getElementById('card-title').value.trim();
-            const phone = document.getElementById('card-phone').value.trim();
-            const email = document.getElementById('card-email').value.trim();
-            const preference = document.getElementById('card-preference').value.trim();
-            const lastMeet = document.getElementById('card-last-meet').value;
-            const meetPlace = document.getElementById('card-meet-place').value.trim();
-            const remark = document.getElementById('card-remark').value.trim();
-
-            if (!name) { alert('請填寫姓名！'); return; }
-
-            if (editingContactId) {
-                const c = contacts.find(item => item.id === editingContactId);
-                if (c) {
-                    c.photo = photo; c.name = name; c.company = company; c.title = title;
-                    c.phone = phone; c.email = email; c.preference = preference;
-                    c.lastMeet = lastMeet; c.meetPlace = meetPlace; c.remark = remark;
-                }
-            } else {
-                contacts.push({ id: Date.now(), photo, name, company, title, phone, email, preference, lastMeet, meetPlace, remark });
-            }
-
-            closeModal('modal-contact');
-            renderContacts();
-        }
-
-        function deleteContact(id) {
-            if (confirm('確定刪除此名片資料？')) {
-                contacts = contacts.filter(c => c.id !== id);
-                renderContacts();
-            }
-        }
-
-
-        // === 5. 節慶送禮規劃邏輯 (對象姓名、備註、編輯鍵) ===
-        function renderGifts() {
-            const tbody = document.getElementById('gift-table-body');
-            tbody.innerHTML = '';
-
-            gifts.forEach(g => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-white/60 transition";
-
-                let statusClass = "bg-amber-100 text-amber-700";
-                if (g.status === '已送達') statusClass = "bg-emerald-100 text-emerald-700";
-
-                tr.innerHTML = `
-                    <td class="p-3.5"><span class="bg-[#9999FF] text-white px-2.5 py-0.5 rounded text-xs font-medium-custom">${g.festival}</span></td>
-                    <td class="p-3.5 font-medium-custom text-[#007799]">${g.target}</td>
-                    <td class="p-3.5">${g.item}</td>
-                    <td class="p-3.5 font-mono">NT$ ${g.amount.toLocaleString()}</td>
-                    <td class="p-3.5 font-mono text-xs">${g.date}</td>
-                    <td class="p-3.5"><span class="${statusClass} px-2.5 py-0.5 rounded-full text-xs font-medium-custom">${g.status}</span></td>
-                    <td class="p-3.5 text-xs text-[#0088A8] max-w-[150px] truncate">${g.remark || '無'}</td>
-                    <td class="p-3.5 text-center space-x-1.5">
-                        <button onclick="viewGiftDetail(${g.id})" class="px-3 py-1 bg-[#00AAAA] text-white rounded-lg hover:bg-[#0088A8] transition"><i class="fa-solid fa-eye"></i> 檢視</button>
-                        <button onclick="editGift(${g.id})" class="px-3 py-1 bg-[#5599FF] text-white rounded-lg hover:bg-[#9999FF] transition"><i class="fa-solid fa-pen-to-square"></i> 編輯</button>
-                        <button onclick="deleteGift(${g.id})" class="px-3 py-1 bg-[#FF8888] text-white rounded-lg hover:bg-red-400 transition"><i class="fa-solid fa-trash"></i> 刪除</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function viewGiftDetail(id) {
-            const g = gifts.find(item => item.id === id);
-            if (!g) return;
-
-            document.getElementById('detail-modal-title').innerText = `送禮紀錄詳情 - ${g.target}`;
-            document.getElementById('detail-modal-body').innerHTML = `
-                <div class="space-y-3 bg-[#CCDDFF]/20 p-4 rounded-xl border border-[#99BBFF]">
-                    <p><strong class="text-[#0088A8]">節慶分類：</strong> ${g.festival}</p>
-                    <p><strong class="text-[#0088A8]">對象姓名：</strong> ${g.target}</p>
-                    <p><strong class="text-[#0088A8]">禮品內容：</strong> ${g.item}</p>
-                    <p><strong class="text-[#0088A8]">預算金額：</strong> NT$ ${g.amount.toLocaleString()}</p>
-                    <p><strong class="text-[#0088A8]">送達日期：</strong> ${g.date}</p>
-                    <p><strong class="text-[#0088A8]">送禮狀態：</strong> ${g.status}</p>
-                    <p><strong class="text-[#0088A8]">備註：</strong> ${g.remark || '無'}</p>
-                </div>
-            `;
-            openModal('modal-detail-view');
-        }
-
-        function openGiftModal() {
-            editingGiftId = null;
-            document.getElementById('gift-modal-title').innerText = "新增送禮紀錄";
-            document.getElementById('gift-target').value = "";
-            document.getElementById('gift-item').value = "";
-            document.getElementById('gift-amount').value = "2000";
-            document.getElementById('gift-date').value = "";
-            document.getElementById('gift-remark').value = "";
-            openModal('modal-gift');
-        }
-
-        function editGift(id) {
-            editingGiftId = id;
-            const g = gifts.find(item => item.id === id);
-            if (!g) return;
-
-            document.getElementById('gift-modal-title').innerText = "編輯送禮紀錄";
-            document.getElementById('gift-festival').value = g.festival;
-            document.getElementById('gift-target').value = g.target;
-            document.getElementById('gift-item').value = g.item;
-            document.getElementById('gift-amount').value = g.amount;
-            document.getElementById('gift-date').value = g.date;
-            document.getElementById('gift-status').value = g.status;
-            document.getElementById('gift-remark').value = g.remark || "";
-            openModal('modal-gift');
-        }
-
-        function saveGift() {
-            const festival = document.getElementById('gift-festival').value;
-            const target = document.getElementById('gift-target').value.trim();
-            const item = document.getElementById('gift-item').value.trim();
-            const amount = parseInt(document.getElementById('gift-amount').value) || 0;
-            const date = document.getElementById('gift-date').value;
-            const status = document.getElementById('gift-status').value;
-            const remark = document.getElementById('gift-remark').value.trim();
-
-            if (!target || !item) { alert('請填寫對象姓名與禮品內容！'); return; }
-
-            if (editingGiftId) {
-                const g = gifts.find(item => item.id === editingGiftId);
-                if (g) {
-                    g.festival = festival; g.target = target; g.item = item;
-                    g.amount = amount; g.date = date; g.status = status; g.remark = remark;
-                }
-            } else {
-                gifts.push({ id: Date.now(), festival, target, item, amount, date, status, remark });
-            }
-
-            closeModal('modal-gift');
-            renderGifts();
-        }
-
-        function deleteGift(id) {
-            if (confirm('確定刪除此送禮紀錄？')) {
-                gifts = gifts.filter(g => g.id !== id);
-                renderGifts();
-            }
-        }
-
-
-        // === 6. 記事本與手繪板 ===
-        function execCmd(command, value = null) {
-            document.execCommand(command, false, value);
-        }
-
-        function saveTextNote() {
-            const content = document.getElementById('rich-editor').innerHTML;
-            const title = prompt('請輸入備忘錄標題：', `備忘錄_${new Date().toLocaleDateString()}`);
-            if (title) {
-                savedNotes.push({ id: Date.now(), title, content });
-                renderSavedNotes();
-                alert('備忘錄已儲存！');
-            }
-        }
-
-        function renderSavedNotes() {
-            const container = document.getElementById('saved-notes-list');
-            container.innerHTML = '';
-
-            savedNotes.forEach(n => {
-                const chip = document.createElement('div');
-                chip.className = "flex items-center gap-2 bg-[#CCDDFF]/60 px-3 py-1.5 rounded-lg text-xs text-[#007799] border border-[#99BBFF]";
-                chip.innerHTML = `
-                    <span onclick="loadNote(${n.id})" class="cursor-pointer font-medium-custom hover:underline"><i class="fa-solid fa-file-lines mr-1"></i>${n.title}</span>
-                    <button onclick="deleteNote(${n.id})" class="text-rose-500 hover:text-rose-700"><i class="fa-solid fa-xmark"></i></button>
-                `;
-                container.appendChild(chip);
-            });
-        }
-
-        function loadNote(id) {
-            const n = savedNotes.find(item => item.id === id);
-            if (n) {
-                document.getElementById('rich-editor').innerHTML = n.content;
-            }
-        }
-
-        function deleteNote(id) {
-            savedNotes = savedNotes.filter(n => n.id !== id);
-            renderSavedNotes();
-        }
-
-        // 手繪板
-        let canvas, ctx, isDrawing = false;
-        function initDrawingCanvas() {
-            canvas = document.getElementById('drawingCanvas');
-            ctx = canvas.getContext('2d');
-
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseleave', stopDrawing);
-        }
-
-        function startDrawing(e) {
-            isDrawing = true;
-            ctx.beginPath();
-            const rect = canvas.getBoundingClientRect();
-            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-        }
-
-        function draw(e) {
-            if (!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            ctx.strokeStyle = document.getElementById('brushColor').value;
-            ctx.lineWidth = document.getElementById('brushSize').value;
-            ctx.lineCap = 'round';
-            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-            ctx.stroke();
-        }
-
-        function stopDrawing() { isDrawing = false; }
-        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-        function downloadCanvas() {
-            const link = document.createElement('a');
-            link.download = `特助簽名筆記_${Date.now()}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-        }
-
-
-        // === 7. 特助名片與全網搜尋 Modal 邏輯 ===
-        function openProfileModal() {
-            document.getElementById('edit-profile-name').value = myProfile.name;
-            document.getElementById('edit-profile-title').value = myProfile.title;
-            document.getElementById('edit-profile-phone').value = myProfile.phone;
-            document.getElementById('edit-profile-email').value = myProfile.email;
-            openModal('modal-profile');
-        }
-
-        function saveProfile() {
-            myProfile.name = document.getElementById('edit-profile-name').value;
-            myProfile.title = document.getElementById('edit-profile-title').value;
-            myProfile.phone = document.getElementById('edit-profile-phone').value;
-            myProfile.email = document.getElementById('edit-profile-email').value;
-
-            const fileInput = document.getElementById('profile-avatar-input');
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    myProfile.avatar = e.target.result;
-                    updateAvatarDisplay();
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            }
-
-            document.getElementById('profile-display-name').innerText = myProfile.name;
-            document.getElementById('profile-display-title').innerText = myProfile.title;
-
-            closeModal('modal-profile');
-        }
-
-        function updateAvatarDisplay() {
-            const img = document.getElementById('my-avatar-img');
-            const icon = document.getElementById('my-avatar-icon');
-            if (myProfile.avatar) {
-                img.src = myProfile.avatar;
-                img.classList.remove('hidden');
-                icon.classList.add('hidden');
-            }
-        }
-
-        function viewMyCardModal() {
-            const avatarHtml = myProfile.avatar ? `<img src="${myProfile.avatar}" class="w-20 h-20 rounded-full object-cover border-2 border-[#5599FF] mx-auto">` : `<div class="w-20 h-20 rounded-full bg-[#CCDDFF] border-2 border-[#5599FF] flex items-center justify-center text-[#007799] text-3xl mx-auto"><i class="fa-solid fa-user"></i></div>`;
-
-            document.getElementById('detail-modal-title').innerText = "特助個人名片";
-            document.getElementById('detail-modal-body').innerHTML = `
-                <div class="space-y-4 bg-[#CCDDFF]/20 p-5 rounded-xl border border-[#99BBFF] text-center">
-                    ${avatarHtml}
-                    <div>
-                        <h3 class="text-xl font-bold-custom text-[#007799]">${myProfile.name}</h3>
-                        <p class="text-sm text-[#0088A8]">竹風建設 True Full Land ｜ ${myProfile.title}</p>
-                    </div>
-                    <div class="text-left space-y-2 text-xs text-[#007799] pt-3 border-t border-[#99BBFF]/50">
-                        <p><strong class="text-[#0088A8]">聯絡電話：</strong> ${myProfile.phone}</p>
-                        <p><strong class="text-[#0088A8]">電子信箱：</strong> ${myProfile.email}</p>
-                        <p><strong class="text-[#0088A8]">服務單位：</strong> 董事長特助辦公室</p>
-                    </div>
-                </div>
-            `;
-            openModal('modal-detail-view');
-        }
-
-        // 全網搜尋
-        function handleGlobalSearch() {
-            const q = document.getElementById('globalSearchInput').value.trim().toLowerCase();
-            const dropdown = document.getElementById('search-results-dropdown');
-
-            if (!q) {
-                dropdown.classList.add('hidden');
-                return;
-            }
-
-            let results = [];
-            // 搜尋專案
-            projects.forEach(p => {
-                if (p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)) {
-                    results.push({ type: '專案', title: p.title, action: () => { switchTab('projects'); viewProjectDetail(p.id); } });
-                }
-            });
-            // 搜尋名片
-            contacts.forEach(c => {
-                if (c.name.toLowerCase().includes(q) || c.company.toLowerCase().includes(q)) {
-                    results.push({ type: '名片', title: `${c.name} (${c.company})`, action: () => { switchTab('contacts'); viewContactDetail(c.id); } });
-                }
-            });
-            // 搜尋簽核
-            tasks.forEach(t => {
-                if (t.name.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q)) {
-                    results.push({ type: '簽核', title: t.name, action: () => { switchTab('tasks'); viewTaskDetail(t.id); } });
-                }
-            });
-            // 搜尋行程
-            schedules.forEach(s => {
-                if (s.title.toLowerCase().includes(q) || s.content.toLowerCase().includes(q)) {
-                    results.push({ type: '行程', title: `${s.date} - ${s.title}`, action: () => { switchTab('calendar'); viewScheduleDetail(s.id); } });
-                }
-            });
-
-            if (results.length === 0) {
-                dropdown.innerHTML = `<div class="p-3 text-xs text-slate-400 text-center">查無相關結果</div>`;
-            } else {
-                dropdown.innerHTML = '';
-                results.forEach(r => {
-                    const item = document.createElement('div');
-                    item.className = "p-2 hover:bg-[#CCDDFF]/40 rounded-lg cursor-pointer text-xs flex items-center justify-between";
-                    item.innerHTML = `<span>${r.title}</span><span class="bg-[#5599FF] text-white px-2 py-0.5 rounded text-[10px]">${r.type}</span>`;
-                    item.onclick = () => {
-                        r.action();
-                        dropdown.classList.add('hidden');
-                    };
-                    dropdown.appendChild(item);
-                });
-            }
-            dropdown.classList.remove('hidden');
-        }
-
-        // Modal 控制輔助
-        function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-            document.getElementById(id).classList.add('flex');
-        }
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-            document.getElementById(id).classList.remove('flex');
-        }
-    </script>
+      }
+
+      const badge = document.getElementById('leaderStatusBadge');
+      if (badge) {
+        badge.innerText = currentStatus;
+        badge.style.backgroundColor = statusColor;
+      }
+    }
+
+    // 每 30 秒自動更新一次主管動態
+    setInterval(updateLeaderStatus, 30000);
+    // 初始化執行一次
+    updateLeaderStatus();
+  </script>
 </body>
 </html>
