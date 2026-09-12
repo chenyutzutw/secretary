@@ -8,103 +8,113 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome 圖示庫 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: 替換為清晰度極佳且線條較細的 Noto Sans TC / Zen Kaku Gothic New -->
+    <!-- Google Fonts: 引入圓體 (M PLUS Rounded 1c) 輕盈細體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400;500&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['"Noto Sans TC"', '"Zen Kaku Gothic New"', 'sans-serif'],
+                        rounded: ['"M PLUS Rounded 1c"', 'Zen Maru Gothic', '"微軟正黑體"', 'sans-serif'],
                     },
                     colors: {
                         custom: {
                             bg1: '#CCDDFF',
-                            bg2: '#E8CCFF',
+                            bg2: '#CCCCFF',
+                            bg3: '#E8CCFF',
                             accent1: '#99BBFF',
                             accent2: '#9999FF',
                             accent3: '#5599FF',
                             text1: '#009FCC',
                             text2: '#0088A8',
-                            text3: '#007799'
+                            text3: '#007799',
+                            text4: '#00AAAA'
                         }
+                    },
+                    boxShadow: {
+                        'kpi-custom': '0 10px 25px -5px #9999FF, 0 8px 10px -6px #99BBFF',
                     }
                 }
             }
         }
     </script>
     <style>
-        /* 全局統一背景漸層：由 #CCDDFF 漸層變到 #E8CCFF */
-        body, aside, header, main { 
-            background: linear-gradient(135deg, #CCDDFF 0%, #E8CCFF 100%) !important;
-            color: #005577; 
-            min-height: 100vh;
-            font-family: 'Noto Sans TC', 'Zen Kaku Gothic New', sans-serif;
-            font-weight: 400; /* 細巧清晰 */
-            letter-spacing: 0.02em;
+        /* 全站統一字型：大波浪圓體風格 / 細字體 */
+        * {
+            font-family: 'M PLUS Rounded 1c', 'Zen Maru Gothic', 'PingFang TC', '微軟正黑體', sans-serif !important;
+            font-weight: 400;
         }
+        .font-light-custom { font-weight: 300 !important; }
+        .font-medium-custom { font-weight: 500 !important; }
         
-        /* 四大 KPI 專屬左側 Accent 區塊顏色設定 */
-        .kpi-accent-1 { background-color: #9999FF !important; }
-        .kpi-accent-2 { background-color: #99BBFF !important; }
+        /* 整個版面背景顏色統一，不要分區塊 */
+        body { 
+            background: linear-gradient(135deg, #E6EEFF 0%, #E0E0FF 50%, #F0E6FF 100%);
+            color: #007799; 
+            min-height: 100vh;
+        }
 
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #99BBFF; border-radius: 4px; }
-        .canvas-container { border: 1px dashed #0088A8; border-radius: 12px; background: #ffffff; }
+        .canvas-container { border: 2px dashed #0088A8; border-radius: 12px; background: #ffffff; cursor: crosshair; }
     </style>
 </head>
-<body class="font-sans antialiased flex h-screen overflow-hidden">
+<body class="font-rounded antialiased flex h-screen overflow-hidden">
 
-    <!-- 1. 左側邊欄 Navigation (無硬邊線，純漸層融合) -->
-    <aside class="w-64 text-[#005577] flex flex-col justify-between shrink-0">
+    <!-- 1. 左側邊欄 Navigation -->
+    <aside class="w-64 bg-white/40 backdrop-blur-md border-r border-[#99BBFF] text-[#007799] flex flex-col justify-between shrink-0 shadow-sm">
         <div>
             <!-- 竹風建設 Logo 區域 -->
-            <div class="h-16 flex items-center px-6 gap-3">
-                <div class="w-9 h-9 rounded-lg bg-[#5599FF] text-white flex items-center justify-center text-lg shadow-sm">
+            <div class="h-16 flex items-center px-4 bg-[#99BBFF]/40 border-b border-[#99BBFF] gap-3">
+                <div class="w-10 h-10 rounded-lg bg-[#007799] text-white flex items-center justify-center text-xl shadow">
                     <i class="fa-solid fa-city"></i>
                 </div>
                 <div class="flex flex-col">
-                    <span class="font-bold text-sm tracking-wide text-[#004466]">竹風建設</span>
-                    <span class="text-[10px] font-normal text-[#007799] tracking-widest">True Full Land</span>
+                    <span class="font-medium-custom text-sm text-[#007799] tracking-wider">竹風建設</span>
+                    <span class="text-[10px] text-[#0088A8] tracking-widest">True Full Land</span>
                 </div>
             </div>
 
             <!-- 主選單 -->
-            <nav class="p-4 space-y-1.5">
-                <button onclick="switchTab('main-home')" id="btn-main-home" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium bg-[#5599FF] text-white shadow-sm transition">
-                    <i class="fa-solid fa-house w-4"></i> 主頁
+            <nav class="p-4 space-y-2">
+                <button onclick="switchTab('main-home')" id="btn-main-home" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm bg-[#5599FF] text-white shadow">
+                    <i class="fa-solid fa-house w-5"></i> 主頁
                 </button>
-                <button onclick="switchTab('calendar')" id="btn-calendar" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium text-[#005577] hover:bg-white/40 transition">
-                    <i class="fa-regular fa-calendar-days w-4"></i> 行事曆
+                <button onclick="switchTab('calendar')" id="btn-calendar" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-[#007799] hover:bg-[#99BBFF]/40 transition">
+                    <i class="fa-regular fa-calendar-days w-5"></i> 行事曆
                 </button>
-                <button onclick="switchTab('tasks')" id="btn-tasks" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium text-[#005577] hover:bg-white/40 transition">
-                    <i class="fa-solid fa-list-check w-4"></i> 簽核與決議追蹤
+                <button onclick="switchTab('tasks')" id="btn-tasks" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-[#007799] hover:bg-[#99BBFF]/40 transition">
+                    <i class="fa-solid fa-list-check w-5"></i> 簽核與決議追蹤
                 </button>
-                <button onclick="switchTab('projects')" id="btn-projects" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium text-[#005577] hover:bg-white/40 transition">
-                    <i class="fa-solid fa-diagram-project w-4"></i> 專案進度
+                <button onclick="switchTab('projects')" id="btn-projects" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-[#007799] hover:bg-[#99BBFF]/40 transition">
+                    <i class="fa-solid fa-diagram-project w-5"></i> 專案進度
                 </button>
-                <button onclick="switchTab('contacts')" id="btn-contacts" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium text-[#005577] hover:bg-white/40 transition">
-                    <i class="fa-solid fa-address-book w-4"></i> 名片資料
+                <button onclick="switchTab('contacts')" id="btn-contacts" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-[#007799] hover:bg-[#99BBFF]/40 transition">
+                    <i class="fa-solid fa-address-book w-5"></i> 名片資料
                 </button>
-                <button onclick="switchTab('gifts')" id="btn-gifts" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium text-[#005577] hover:bg-white/40 transition">
-                    <i class="fa-solid fa-gift w-4"></i> 節慶送禮規劃
+                <button onclick="switchTab('gifts')" id="btn-gifts" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-[#007799] hover:bg-[#99BBFF]/40 transition">
+                    <i class="fa-solid fa-gift w-5"></i> 節慶送禮規劃
                 </button>
-                <button onclick="switchTab('notepad')" id="btn-notepad" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium text-[#005577] hover:bg-white/40 transition">
-                    <i class="fa-solid fa-pen-to-square w-4"></i> 記事本
+                <button onclick="switchTab('notepad')" id="btn-notepad" class="nav-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-[#007799] hover:bg-[#99BBFF]/40 transition">
+                    <i class="fa-solid fa-pen-to-square w-5"></i> 記事本
                 </button>
             </nav>
         </div>
 
-        <!-- 特助名牌 -->
-        <div class="p-4 flex items-center gap-3 cursor-pointer hover:bg-white/30 rounded-2xl mx-2 my-2 transition">
-            <div class="relative w-10 h-10 rounded-full overflow-hidden bg-white/60 border border-[#99BBFF] flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-user text-[#005577] text-sm"></i>
+        <!-- 左下角個人名片 (頭像點擊為編輯，名字點擊為檢視) -->
+        <div class="p-4 border-t border-[#99BBFF] flex items-center gap-3 bg-white/30">
+            <!-- 頭像區域：點擊 trigger 編輯 Modal -->
+            <div title="點擊上傳/編輯頭像" class="relative w-11 h-11 rounded-full overflow-hidden border-2 border-[#5599FF] bg-[#CCDDFF] flex items-center justify-center shrink-0 cursor-pointer hover:opacity-80 transition" onclick="openProfileModal()">
+                <img id="my-avatar-img" src="" class="w-full h-full object-cover hidden">
+                <i id="my-avatar-icon" class="fa-solid fa-user text-[#007799] text-lg"></i>
             </div>
-            <div class="text-xs">
-                <p class="font-bold text-[#004466]">Alice Chen</p>
-                <p class="text-[#007799] text-[11px]">董事長秘書</p>
+            <!-- 名字區域：點擊開啟名片檢視 Modal -->
+            <div class="text-xs cursor-pointer" onclick="viewMyCardModal()">
+                <p class="font-medium-custom text-[#007799] hover:text-[#5599FF] hover:underline" id="profile-display-name">Alice Chen</p>
+                <p class="text-[#0088A8] text-[11px]" id="profile-display-title">董事長特助</p>
             </div>
         </div>
     </aside>
@@ -112,726 +122,1198 @@
     <!-- 2. 主內容區域 -->
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
         
-        <!-- Header 頂部列 (簡化邊框) -->
-        <header class="h-16 px-8 flex items-center justify-between shrink-0">
-            <!-- 全域即時搜尋列 -->
-            <div class="relative w-80">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#007799] text-xs"></i>
-                <input type="text" id="globalSearchInput" placeholder="搜尋關鍵字..." class="w-full pl-9 pr-4 py-1.5 text-xs bg-white/70 backdrop-blur-md border border-white/50 text-[#004466] font-normal rounded-xl focus:outline-none focus:bg-white transition shadow-sm">
+        <!-- Header 頂部列 (即時搜尋與時間狀態) -->
+        <header class="h-16 bg-white/20 border-b border-[#99BBFF] px-6 flex items-center justify-between shrink-0">
+            <div class="relative w-96">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#0088A8] text-sm"></i>
+                <input type="text" id="globalSearchInput" oninput="handleGlobalSearch()" placeholder="全網搜尋 (專案、名片、簽核、行程...)" class="w-full pl-9 pr-4 py-1.5 text-sm bg-white/70 border border-[#99BBFF] text-[#007799] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#5599FF]">
+                <div id="search-results-dropdown" class="absolute left-0 top-11 w-full bg-white/95 border border-[#99BBFF] rounded-xl shadow-xl z-50 max-h-80 overflow-y-auto custom-scrollbar hidden p-2 space-y-1"></div>
             </div>
 
-            <!-- 主管狀態與時間 -->
             <div class="flex items-center gap-4">
-                <div class="text-right text-xs text-[#005577]">
-                    <div id="clock-date" class="font-medium">2026-09-13 (日)</div>
-                    <div id="clock-time" class="text-[#007799] font-mono text-[11px]">00:58:32</div>
+                <div class="text-right text-xs text-[#007799]">
+                    <div id="clock-date">2026-09-13 (日)</div>
+                    <div id="clock-time" class="text-[#0088A8] font-mono">01:00:00</div>
                 </div>
-                <div class="flex items-center gap-2 text-xs px-3 py-1 rounded-full font-medium bg-white/60 backdrop-blur-md shadow-sm">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-[#005577]">行程中</span>
+                <div id="boss-status-badge" class="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border border-[#99BBFF] bg-white/60 shadow-sm">
+                    <span id="boss-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="boss-status-text" class="text-[#007799]">主管在辦公室</span>
                 </div>
             </div>
         </header>
 
         <!-- 動態內容區域 -->
-        <main class="flex-1 p-8 overflow-y-auto custom-scrollbar">
+        <main class="flex-1 p-6 overflow-y-auto custom-scrollbar">
 
-            <!-- PAGE 1: 主頁儀表板 (Dashboard) -->
+            <!-- PAGE 1: 主頁 (Dashboard) -->
             <section id="tab-main-home" class="space-y-6">
-                <!-- 四大 KPI (左側 Accent 顏色為 #9999FF 與 #99BBFF) -->
+                <!-- 四大 KPI (陰影改為 #9999FF 與 #99BBFF) -->
                 <div class="grid grid-cols-4 gap-5">
-                    <div onclick="switchTab('calendar')" class="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-sm transition hover:shadow-md cursor-pointer flex overflow-hidden">
-                        <div class="w-2 rounded-full mr-3.5 kpi-accent-1"></div>
-                        <div class="flex-1 flex items-center justify-between">
+                    <div onclick="switchTab('calendar')" class="bg-white/80 p-4 rounded-2xl border border-[#99BBFF] shadow-kpi-custom hover:translate-y-[-2px] transition cursor-pointer border-l-4 border-l-[#5599FF]">
+                        <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-xs font-normal text-[#007799]">今日主管行程</p>
-                                <p class="text-xl font-bold text-[#004466] mt-1" id="kpi-today-count">3 場會議</p>
+                                <p class="text-xs text-[#0088A8]">今日主管行程</p>
+                                <p class="text-xl font-medium-custom text-[#007799] mt-1" id="kpi-today-count">3 場會議</p>
                             </div>
-                            <div class="w-9 h-9 rounded-xl bg-[#CCDDFF]/50 text-[#005577] flex items-center justify-center text-sm"><i class="fa-regular fa-calendar"></i></div>
+                            <div class="w-10 h-10 rounded-xl bg-[#CCDDFF]/60 text-[#007799] flex items-center justify-center text-lg"><i class="fa-regular fa-calendar"></i></div>
                         </div>
                     </div>
 
-                    <div onclick="switchTab('tasks')" class="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-sm transition hover:shadow-md cursor-pointer flex overflow-hidden">
-                        <div class="w-2 rounded-full mr-3.5 kpi-accent-2"></div>
-                        <div class="flex-1 flex items-center justify-between">
+                    <div onclick="switchTab('tasks')" class="bg-white/80 p-4 rounded-2xl border border-[#99BBFF] shadow-kpi-custom hover:translate-y-[-2px] transition cursor-pointer border-l-4 border-l-[#9999FF]">
+                        <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-xs font-normal text-[#007799]">待追蹤簽核</p>
-                                <p class="text-xl font-bold text-[#004466] mt-1" id="kpi-task-count">2 件待辦</p>
+                                <p class="text-xs text-[#0088A8]">待追蹤簽核</p>
+                                <p class="text-xl font-medium-custom text-[#007799] mt-1" id="kpi-task-count">2 件待辦</p>
                             </div>
-                            <div class="w-9 h-9 rounded-xl bg-[#CCDDFF]/50 text-[#005577] flex items-center justify-center text-sm"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                            <div class="w-10 h-10 rounded-xl bg-[#E8CCFF]/60 text-[#007799] flex items-center justify-center text-lg"><i class="fa-solid fa-clock-rotate-left"></i></div>
                         </div>
                     </div>
 
-                    <div onclick="switchTab('projects')" class="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-sm transition hover:shadow-md cursor-pointer flex overflow-hidden">
-                        <div class="w-2 rounded-full mr-3.5 kpi-accent-1"></div>
-                        <div class="flex-1 flex items-center justify-between">
+                    <div onclick="switchTab('projects')" class="bg-white/80 p-4 rounded-2xl border border-[#99BBFF] shadow-kpi-custom hover:translate-y-[-2px] transition cursor-pointer border-l-4 border-l-[#5599FF]">
+                        <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-xs font-normal text-[#007799]">進行中專案</p>
-                                <p class="text-xl font-bold text-[#004466] mt-1" id="kpi-project-count">3 項專案</p>
+                                <p class="text-xs text-[#0088A8]">進行中專案</p>
+                                <p class="text-xl font-medium-custom text-[#007799] mt-1" id="kpi-project-count">3 項專案</p>
                             </div>
-                            <div class="w-9 h-9 rounded-xl bg-[#CCDDFF]/50 text-[#005577] flex items-center justify-center text-sm"><i class="fa-solid fa-diagram-project"></i></div>
+                            <div class="w-10 h-10 rounded-xl bg-[#CCDDFF]/60 text-[#007799] flex items-center justify-center text-lg"><i class="fa-solid fa-diagram-project"></i></div>
                         </div>
                     </div>
 
-                    <div onclick="switchTab('gifts')" class="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-sm transition hover:shadow-md cursor-pointer flex overflow-hidden">
-                        <div class="w-2 rounded-full mr-3.5 kpi-accent-2"></div>
-                        <div class="flex-1 flex items-center justify-between">
+                    <div onclick="switchTab('gifts')" class="bg-white/80 p-4 rounded-2xl border border-[#99BBFF] shadow-kpi-custom hover:translate-y-[-2px] transition cursor-pointer border-l-4 border-l-[#9999FF]">
+                        <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-xs font-normal text-[#007799]">送禮規劃進度</p>
-                                <p class="text-xl font-bold text-[#004466] mt-1">100% 已紀錄</p>
+                                <p class="text-xs text-[#0088A8]">送禮規劃進度</p>
+                                <p class="text-xl font-medium-custom text-[#007799] mt-1">100% 已紀錄</p>
                             </div>
-                            <div class="w-9 h-9 rounded-xl bg-[#CCDDFF]/50 text-[#005577] flex items-center justify-center text-sm"><i class="fa-solid fa-gift"></i></div>
+                            <div class="w-10 h-10 rounded-xl bg-[#E8CCFF]/60 text-[#007799] flex items-center justify-center text-lg"><i class="fa-solid fa-gift"></i></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 公告與操作 -->
+                <!-- 公告與快捷操作 -->
                 <div class="grid grid-cols-3 gap-6">
-                    <div class="col-span-2 bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-sm space-y-4">
-                        <h3 class="font-bold text-base text-[#004466] flex items-center gap-2">
-                            <i class="fa-solid fa-bullhorn text-[#5599FF]"></i> 重要公告與行政焦點
+                    <div class="col-span-2 bg-white/70 p-5 rounded-2xl border border-[#99BBFF] space-y-4 shadow-sm">
+                        <h3 class="font-medium-custom text-base text-[#007799] flex items-center gap-2 border-b border-[#99BBFF]/60 pb-2">
+                            <i class="fa-solid fa-bullhorn text-[#5599FF]"></i> 竹風建設 重要公告與行政焦點
                         </h3>
-                        <div class="space-y-3 text-xs text-[#005577]">
-                            <div class="p-3.5 bg-white/60 rounded-xl border border-white">
-                                <span class="bg-[#5599FF] text-white px-2 py-0.5 rounded text-[10px] font-medium">重大工程</span>
-                                <p class="text-sm font-bold text-[#004466] mt-1">竹北「竹風樹海」二期建案動土典禮預備會議</p>
-                                <p class="text-[#007799] mt-0.5">請特助確認建築師團隊與縣府官員出席名單。</p>
+                        <div class="space-y-3 text-xs text-[#007799]">
+                            <div class="p-3 bg-white/60 rounded-xl border border-[#99BBFF]/50">
+                                <span class="bg-[#5599FF] text-white px-2 py-0.5 rounded text-[10px]">公司重大工程</span>
+                                <p class="text-sm font-medium-custom mt-1">竹北「竹風樹海」二期建案動土典禮預備會議</p>
+                                <p class="text-[#0088A8] mt-0.5">請特助確認建築師團隊與縣府官員出席名單。</p>
                             </div>
-                            <div class="p-3.5 bg-white/60 rounded-xl border border-white">
-                                <span class="bg-[#9999FF] text-white px-2 py-0.5 rounded text-[10px] font-medium">董事會通知</span>
-                                <p class="text-sm font-bold text-[#004466] mt-1">Q3 經營績效審查會呈報資料簽核</p>
-                                <p class="text-[#007799] mt-0.5">請於本週五前完成財務部與研發部之報告彙整。</p>
+                            <div class="p-3 bg-white/60 rounded-xl border border-[#99BBFF]/50">
+                                <span class="bg-[#9999FF] text-white px-2 py-0.5 rounded text-[10px]">董事會通知</span>
+                                <p class="text-sm font-medium-custom mt-1">Q3 經營績效審查會呈報資料簽核</p>
+                                <p class="text-[#0088A8] mt-0.5">請於本週五前完成財務部與研發部之報告彙整。</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-sm space-y-3">
-                        <h3 class="font-bold text-base text-[#004466]">快捷操作</h3>
-                        <button onclick="openScheduleModal()" class="w-full py-2.5 bg-[#5599FF] text-white rounded-xl text-xs font-medium hover:bg-[#4488EE] transition shadow-sm">+ 新增主管行程</button>
-                        <button onclick="openTaskModal()" class="w-full py-2.5 bg-[#9999FF] text-white rounded-xl text-xs font-medium hover:bg-[#8888EE] transition shadow-sm">+ 呈送簽核任務</button>
-                        <button onclick="openContactModal()" class="w-full py-2.5 bg-white text-[#005577] border border-[#99BBFF] rounded-xl text-xs font-medium hover:bg-white/80 transition shadow-sm">+ 新增 VIP 名片</button>
+                    <div class="bg-white/70 p-5 rounded-2xl border border-[#99BBFF] space-y-3 shadow-sm">
+                        <h3 class="font-medium-custom text-base text-[#007799] border-b border-[#99BBFF]/60 pb-2">快捷操作</h3>
+                        <button onclick="openScheduleModal()" class="w-full py-2.5 bg-[#5599FF] text-white rounded-xl text-xs hover:bg-[#9999FF] transition shadow-sm">+ 新增主管行程</button>
+                        <button onclick="openTaskModal()" class="w-full py-2.5 bg-[#00AAAA] text-white rounded-xl text-xs hover:bg-[#0088A8] transition shadow-sm">+ 呈送簽核任務</button>
+                        <button onclick="openContactModal()" class="w-full py-2.5 bg-[#9999FF] text-white rounded-xl text-xs hover:bg-[#5599FF] transition shadow-sm">+ 新增 VIP 名片</button>
                     </div>
                 </div>
             </section>
 
-            <!-- PAGE 2: 行事曆 -->
+            <!-- PAGE 2: 行事曆 (上下分層結構) -->
             <section id="tab-calendar" class="hidden space-y-6">
-                <div class="flex flex-col gap-6">
-                    <!-- 上方月曆 -->
-                    <div class="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-sm space-y-4">
-                        <div class="flex items-center justify-between pb-2">
-                            <button onclick="changeMonth(-1)" class="p-1 text-[#005577] hover:text-[#5599FF]"><i class="fa-solid fa-chevron-left"></i></button>
-                            <h3 class="font-bold text-base text-[#004466]" id="calendar-month-year-display">2026 年 09 月</h3>
-                            <button onclick="changeMonth(1)" class="p-1 text-[#005577] hover:text-[#5599FF]"><i class="fa-solid fa-chevron-right"></i></button>
-                        </div>
-                        <div class="grid grid-cols-7 gap-2 text-center text-xs text-[#007799] font-medium">
-                            <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
-                        </div>
-                        <div class="grid grid-cols-7 gap-2 text-center text-xs" id="calendar-days-grid"></div>
-                        <div class="flex justify-end pt-2">
-                            <button onclick="openScheduleModal()" class="px-5 py-2 bg-[#5599FF] text-white rounded-xl text-xs font-medium hover:bg-[#4488EE] transition shadow-sm">+ 排定新行程</button>
+                <!-- 上層：月曆區 -->
+                <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-[#99BBFF]/60 pb-3">
+                        <button onclick="changeMonth(-1)" class="px-2 py-1 text-[#007799] hover:text-[#5599FF]"><i class="fa-solid fa-chevron-left"></i> 上個月</button>
+                        <h3 class="font-medium-custom text-base text-[#007799]" id="calendar-month-year-display">2026 年 09 月</h3>
+                        <button onclick="changeMonth(1)" class="px-2 py-1 text-[#007799] hover:text-[#5599FF]">下個月 <i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    
+                    <div class="grid grid-cols-7 gap-1 text-center text-xs text-[#0088A8] font-medium-custom py-1 border-b border-[#99BBFF]/30">
+                        <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2 text-center text-xs" id="calendar-days-grid"></div>
+                </div>
+
+                <!-- 下層：詳細行程列表與操作 -->
+                <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-[#99BBFF]/60 pb-3">
+                        <h3 class="font-medium-custom text-base text-[#007799] flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-day text-[#5599FF]"></i> 詳細行程列表
+                        </h3>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs bg-[#CCDDFF] text-[#007799] px-3 py-1 rounded-full font-medium-custom" id="selected-date-badge">2026-09-13</span>
+                            <button onclick="openScheduleModal()" class="px-4 py-1.5 bg-[#5599FF] text-white rounded-xl text-xs hover:bg-[#9999FF] transition shadow-sm">+ 新增此日行程</button>
                         </div>
                     </div>
 
-                    <!-- 下方詳細行程列表 (可點擊檢視、右側有編輯與刪除) -->
-                    <div class="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-sm space-y-4">
-                        <div class="flex items-center justify-between pb-2">
-                            <h3 class="font-bold text-base text-[#004466] flex items-center gap-2">
-                                <i class="fa-solid fa-calendar-day text-[#5599FF]"></i> 詳細行程列表
-                            </h3>
-                            <span class="text-xs bg-[#99BBFF]/40 text-[#004466] font-medium px-3 py-1 rounded-full" id="selected-date-badge">2026-09-13</span>
-                        </div>
-                        <div class="space-y-3" id="selected-day-schedule-list"></div>
-                    </div>
+                    <div class="space-y-3 min-h-[150px]" id="selected-day-schedule-list"></div>
                 </div>
             </section>
 
             <!-- PAGE 3: 簽核與決議追蹤 -->
             <section id="tab-tasks" class="hidden space-y-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-bold text-[#004466]">簽核與決議追蹤</h2>
-                    <button onclick="openTaskModal()" class="px-4 py-2 bg-[#5599FF] text-white text-xs font-medium rounded-xl shadow-sm hover:bg-[#4488EE] transition">+ 新增簽核任務</button>
+                <div class="flex items-center justify-between bg-white/80 p-4 rounded-2xl border border-[#99BBFF]">
+                    <h2 class="text-lg font-medium-custom text-[#007799]">簽核與決議追蹤</h2>
+                    <button onclick="openTaskModal()" class="px-4 py-2 bg-[#5599FF] text-white text-xs rounded-xl hover:bg-[#9999FF] transition shadow-sm">+ 新增簽核任務</button>
                 </div>
 
-                <div class="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-sm overflow-x-auto">
+                <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr class="text-[#007799] border-b border-[#99BBFF]/40">
-                                <th class="pb-3 font-medium">專案名稱 (點擊查看)</th>
-                                <th class="pb-3 font-medium">分類</th>
-                                <th class="pb-3 font-medium">呈送單位</th>
-                                <th class="pb-3 font-medium">負責人</th>
-                                <th class="pb-3 font-medium">截止日</th>
-                                <th class="pb-3 font-medium">簽核狀態</th>
-                                <th class="pb-3 font-medium text-right">操作</th>
+                            <tr class="border-b border-[#99BBFF] text-[#0088A8] bg-[#CCDDFF]/30">
+                                <th class="p-3">專案名稱 (點擊直接檢視)</th>
+                                <th class="p-3">分類</th>
+                                <th class="p-3">呈送單位</th>
+                                <th class="p-3">負責人</th>
+                                <th class="p-3">截止日</th>
+                                <th class="p-3">簽核狀態</th>
+                                <th class="p-3 text-center">操作</th>
                             </tr>
                         </thead>
-                        <tbody id="task-table-body" class="divide-y divide-white/60 text-[#005577]"></tbody>
+                        <tbody id="task-table-body" class="divide-y divide-[#99BBFF]/30 text-[#007799]"></tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- PAGE 4: 專案進度 (3個範本，可查看，右側編輯/刪除) -->
+            <!-- PAGE 4: 專案進度 (包含多檔案編輯、刪除、下拉選單分類與獨立顏色) -->
             <section id="tab-projects" class="hidden space-y-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-bold text-[#004466]">專案進度控管</h2>
-                    <button onclick="openProjectModal()" class="px-4 py-2 bg-[#5599FF] text-white text-xs font-medium rounded-xl shadow-sm hover:bg-[#4488EE] transition">+ 新增專案</button>
+                <div class="flex items-center justify-between bg-white/80 p-4 rounded-2xl border border-[#99BBFF]">
+                    <h2 class="text-lg font-medium-custom text-[#007799]">專案進度控管</h2>
+                    <button onclick="openProjectModal()" class="px-4 py-2 bg-[#00AAAA] text-white text-xs rounded-xl hover:bg-[#0088A8] transition shadow-sm">+ 新增專案</button>
                 </div>
 
-                <div class="grid grid-cols-3 gap-6" id="projects-container"></div>
+                <div class="grid grid-cols-2 gap-6" id="projects-container"></div>
             </section>
 
-            <!-- PAGE 5: 名片資料 (5個範例，可編輯，已去除排序標語) -->
+            <!-- PAGE 5: 名片資料 (右上無依筆劃說明，欄位含聯絡方式) -->
             <section id="tab-contacts" class="hidden space-y-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-bold text-[#004466]">名片資料</h2>
-                    <button onclick="openContactModal()" class="px-4 py-2 bg-[#5599FF] text-white text-xs font-medium rounded-xl shadow-sm hover:bg-[#4488EE] transition">+ 新增名片</button>
+                <div class="flex items-center justify-between bg-white/80 p-4 rounded-2xl border border-[#99BBFF]">
+                    <h2 class="text-lg font-medium-custom text-[#007799]">名片資料</h2>
+                    <button onclick="openContactModal()" class="px-4 py-2 bg-[#5599FF] text-white text-xs rounded-xl hover:bg-[#9999FF] transition shadow-sm">+ 新增名片</button>
                 </div>
 
-                <div class="bg-white/70 backdrop-blur-md p-4 rounded-2xl shadow-sm">
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#007799] text-xs"></i>
-                        <input type="text" id="contactSearch" oninput="renderContacts()" placeholder="搜尋姓名、公司、職稱..." class="w-full pl-9 pr-4 py-2 text-xs bg-white/80 border border-white/50 text-[#004466] rounded-xl focus:outline-none">
+                <div class="bg-white/80 p-4 rounded-2xl border border-[#99BBFF]">
+                    <div class="relative w-full">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#0088A8] text-sm"></i>
+                        <input type="text" id="contactSearch" oninput="renderContacts()" placeholder="搜尋姓名、公司、手機、電話..." class="w-full pl-9 pr-4 py-2 text-sm bg-white/70 border border-[#99BBFF] text-[#007799] rounded-xl">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-6" id="contacts-container"></div>
             </section>
 
-            <!-- PAGE 6: 節慶送禮規劃 -->
+            <!-- PAGE 6: 節慶送禮規劃 (點擊直接檢視，無右側檢視按鈕) -->
             <section id="tab-gifts" class="hidden space-y-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-bold text-[#004466]">節慶送禮規劃</h2>
-                    <button onclick="openGiftModal()" class="px-4 py-2 bg-[#9999FF] text-white text-xs font-medium rounded-xl shadow-sm hover:bg-[#8888EE] transition">+ 新增送禮紀錄</button>
+                <div class="flex items-center justify-between bg-white/80 p-4 rounded-2xl border border-[#99BBFF]">
+                    <h2 class="text-lg font-medium-custom text-[#007799]">節慶與公關送禮規劃</h2>
+                    <button onclick="openGiftModal()" class="px-4 py-2 bg-[#9999FF] text-white text-xs rounded-xl hover:bg-[#5599FF] transition shadow-sm">+ 新增送禮紀錄</button>
                 </div>
 
-                <div class="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-sm overflow-x-auto">
+                <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr class="text-[#007799] border-b border-[#99BBFF]/40">
-                                <th class="pb-3 font-medium">節慶分類</th>
-                                <th class="pb-3 font-medium">對象姓名</th>
-                                <th class="pb-3 font-medium">禮品內容</th>
-                                <th class="pb-3 font-medium">金額</th>
-                                <th class="pb-3 font-medium">日期</th>
-                                <th class="pb-3 font-medium">狀態</th>
-                                <th class="pb-3 font-medium">備註/謝卡</th>
-                                <th class="pb-3 font-medium text-right">操作</th>
+                            <tr class="border-b border-[#99BBFF] text-[#0088A8] bg-[#CCDDFF]/30">
+                                <th class="p-3">節慶分類</th>
+                                <th class="p-3">對象姓名 (點擊檢視)</th>
+                                <th class="p-3">禮品內容</th>
+                                <th class="p-3">金額</th>
+                                <th class="p-3">日期</th>
+                                <th class="p-3">狀態</th>
+                                <th class="p-3">備註/謝卡</th>
+                                <th class="p-3 text-center">操作</th>
                             </tr>
                         </thead>
-                        <tbody id="gift-table-body" class="divide-y divide-white/60 text-[#005577]"></tbody>
+                        <tbody id="gift-table-body" class="divide-y divide-[#99BBFF]/30 text-[#007799]"></tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- PAGE 7: 記事本 (空白編輯器，下方有儲存備忘錄範本，可編輯刪除) -->
+            <!-- PAGE 7: 記事本 (備忘錄改檔名/刪除 + 手繪繪圖板) -->
             <section id="tab-notepad" class="hidden space-y-6">
-                <!-- 上方：空白編輯器 -->
-                <div class="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-sm space-y-3">
-                    <div class="flex justify-between items-center pb-2 border-b border-white">
-                        <h3 class="font-bold text-base text-[#004466]"><i class="fa-solid fa-file-pen text-[#5599FF] mr-2"></i>隨手記事與備忘錄</h3>
-                        <button onclick="saveCurrentNote()" class="px-4 py-1.5 bg-[#5599FF] text-white text-xs font-medium rounded-xl hover:bg-[#4488EE] transition shadow-sm">儲存備忘錄</button>
+                <!-- 文字備忘錄 -->
+                <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm space-y-3">
+                    <div class="flex justify-between items-center border-b border-[#99BBFF]/60 pb-2">
+                        <h3 class="font-medium-custom text-[#007799]"><i class="fa-solid fa-file-pen text-[#5599FF] mr-2"></i>文字備忘錄</h3>
+                        <button onclick="saveTextNote()" class="px-4 py-1.5 bg-[#5599FF] text-white text-xs rounded-xl hover:bg-[#9999FF] transition shadow-sm">儲存備忘錄</button>
                     </div>
 
-                    <div class="flex items-center gap-2 bg-white/50 p-2 rounded-xl text-xs">
-                        <button onclick="execCmd('bold')" class="px-2.5 py-1 bg-white rounded shadow-sm hover:bg-slate-50 font-bold">B</button>
-                        <button onclick="execCmd('underline')" class="px-2.5 py-1 bg-white rounded shadow-sm hover:bg-slate-50 underline">U</button>
-                        <button onclick="execCmd('italic')" class="px-2.5 py-1 bg-white rounded shadow-sm hover:bg-slate-50 italic">I</button>
+                    <div class="flex items-center gap-2 bg-[#CCDDFF]/30 p-2 rounded-xl text-xs">
+                        <button onclick="execCmd('bold')" class="px-2 py-1 bg-white rounded border hover:bg-slate-100 font-bold">B</button>
+                        <button onclick="execCmd('underline')" class="px-2 py-1 bg-white rounded border hover:bg-slate-100 underline">U</button>
+                        <button onclick="execCmd('italic')" class="px-2 py-1 bg-white rounded border hover:bg-slate-100 italic">I</button>
                         <span class="text-slate-300">|</span>
-                        <input type="color" onchange="execCmd('foreColor', this.value)" class="w-6 h-6 border-0 rounded cursor-pointer bg-transparent">
+                        <label class="text-[#0088A8]">顏色：</label>
+                        <input type="color" onchange="execCmd('foreColor', this.value)" class="w-6 h-6 border-0 rounded cursor-pointer">
                     </div>
 
-                    <!-- 空白富文本區域 -->
-                    <div id="rich-editor" contenteditable="true" class="w-full h-36 p-3 bg-white/80 rounded-xl text-xs text-[#004466] focus:outline-none overflow-y-auto"></div>
-                </div>
-
-                <!-- 下方：已儲存備忘錄列表範本 (可編輯/可刪除) -->
-                <div class="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-sm space-y-4">
-                    <h3 class="font-bold text-base text-[#004466]">已儲存的備忘錄範本</h3>
-                    <div id="notes-list-container" class="grid grid-cols-2 gap-4"></div>
-                </div>
-
-                <!-- 手繪板 -->
-                <div class="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-sm space-y-3">
-                    <div class="flex justify-between items-center pb-2 border-b border-white">
-                        <h3 class="font-bold text-base text-[#004466]"><i class="fa-solid fa-palette text-[#9999FF] mr-2"></i>手繪與簽名板</h3>
-                        <button onclick="clearCanvas()" class="px-3 py-1 bg-rose-400 text-white text-xs font-medium rounded-xl hover:bg-rose-500 transition shadow-sm">清空</button>
+                    <div id="rich-editor" contenteditable="true" class="w-full h-36 p-3 bg-white/90 border border-[#99BBFF] rounded-xl text-xs text-[#007799] focus:outline-none overflow-y-auto">
+                        在此可編輯會議紀錄、公文摘要或隨手筆記...
                     </div>
+
+                    <div class="pt-2 border-t border-[#99BBFF]/40 space-y-2">
+                        <p class="text-xs text-[#0088A8] font-medium-custom">歷史備忘錄紀錄：</p>
+                        <div id="saved-notes-list" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <!-- 數位手繪板 (校正游標) -->
+                <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm space-y-3">
+                    <div class="flex justify-between items-center border-b border-[#99BBFF]/60 pb-2">
+                        <h3 class="font-medium-custom text-[#007799]"><i class="fa-solid fa-palette text-[#00AAAA] mr-2"></i>數位手繪與簽名板</h3>
+                        <div class="flex items-center gap-2">
+                            <button onclick="clearCanvas()" class="px-3 py-1 bg-[#FF8888] text-white text-xs rounded-xl hover:bg-red-400 transition">清空</button>
+                            <button onclick="downloadCanvas()" class="px-3 py-1 bg-[#00AAAA] text-white text-xs rounded-xl hover:bg-[#0088A8] transition">下載圖檔</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 bg-[#CCDDFF]/30 p-2 rounded-xl text-xs text-[#007799]">
+                        <div class="flex items-center gap-1">
+                            <label>筆觸顏色：</label>
+                            <input type="color" id="brushColor" value="#007799" class="w-6 h-6 border-0 rounded cursor-pointer">
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <label>粗細：</label>
+                            <input type="range" id="brushSize" min="1" max="12" value="3" class="w-24 cursor-pointer">
+                        </div>
+                    </div>
+
                     <div class="canvas-container overflow-hidden">
-                        <canvas id="drawingCanvas" width="900" height="200" class="cursor-crosshair w-full bg-white/90"></canvas>
+                        <canvas id="drawingCanvas" width="900" height="300" class="w-full bg-white"></canvas>
                     </div>
                 </div>
             </section>
-
         </main>
     </div>
 
-    <!-- 全局彈窗 MODALS -->
-    <!-- 通用詳細/編輯檢視 Modal -->
+    <!-- 3. MODALS 彈窗系統 -->
+
+    <!-- Modal: 通用詳細內容檢視 -->
     <div id="modal-detail-view" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
-        <div class="bg-white/95 rounded-2xl p-6 w-[550px] shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto custom-scrollbar border border-white">
-            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-                <h3 class="text-base font-bold text-[#004466]" id="detail-modal-title">詳細資訊</h3>
-                <button onclick="closeModal('modal-detail-view')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-white rounded-2xl p-6 w-[550px] border-2 border-[#99BBFF] shadow-xl space-y-4 max-h-[85vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center border-b border-[#99BBFF] pb-3">
+                <h3 class="text-base font-medium-custom text-[#007799]" id="detail-modal-title">詳細內容</h3>
+                <button onclick="closeModal('modal-detail-view')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div id="detail-modal-body" class="space-y-3 text-xs text-[#005577]"></div>
-            <div class="flex justify-end pt-2 gap-2" id="detail-modal-actions">
-                <button onclick="closeModal('modal-detail-view')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-medium rounded-xl">關閉</button>
+            <div id="detail-modal-body" class="space-y-3 text-xs text-[#007799]"></div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeModal('modal-detail-view')" class="px-4 py-1.5 bg-[#5599FF] text-white text-xs rounded-xl">關閉</button>
             </div>
         </div>
     </div>
 
-    <!-- JS 邏輯數據處理 -->
+    <!-- Modal: 特助個人名片編輯 (照片上傳永久固定) -->
+    <div id="modal-profile" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[420px] border-2 border-[#99BBFF] shadow-xl space-y-4">
+            <h3 class="text-base font-medium-custom text-[#007799] border-b border-[#99BBFF] pb-2">編輯個人名片</h3>
+            <div class="space-y-3 text-xs text-[#007799]">
+                <div>
+                    <label class="block mb-1 text-[#0088A8]">上傳個人照片</label>
+                    <input type="file" id="profile-avatar-input" accept="image/*" class="w-full p-2 border border-[#99BBFF] rounded-lg bg-white">
+                </div>
+                <div><label class="block mb-1 text-[#0088A8]">姓名</label><input type="text" id="edit-profile-name" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">職稱</label><input type="text" id="edit-profile-title" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">手機</label><input type="text" id="edit-profile-phone" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">Email</label><input type="text" id="edit-profile-email" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('modal-profile')" class="px-4 py-1.5 bg-slate-200 text-slate-700 text-xs rounded-lg">取消</button>
+                <button onclick="saveProfile()" class="px-4 py-1.5 bg-[#5599FF] text-white text-xs rounded-lg">儲存名片</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: 新增/編輯 行事曆 -->
+    <div id="modal-schedule" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[450px] border-2 border-[#99BBFF] shadow-xl space-y-4">
+            <h3 class="text-base font-medium-custom text-[#007799] border-b border-[#99BBFF] pb-2">排定主管行程</h3>
+            <div class="space-y-3 text-xs text-[#007799]">
+                <div><label class="block mb-1 text-[#0088A8]">行程日期</label><input type="date" id="sched-date" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">時間範圍</label><input type="text" id="sched-time" placeholder="例如: 10:00 - 11:30" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">行程標題</label><input type="text" id="sched-title" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">地點 / 備註</label><input type="text" id="sched-location" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('modal-schedule')" class="px-4 py-1.5 bg-slate-200 text-slate-700 text-xs rounded-lg">取消</button>
+                <button onclick="saveSchedule()" class="px-4 py-1.5 bg-[#5599FF] text-white text-xs rounded-lg">儲存行程</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: 新增/編輯 簽核任務 -->
+    <div id="modal-task" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[450px] border-2 border-[#99BBFF] shadow-xl space-y-4">
+            <h3 class="text-base font-medium-custom text-[#007799] border-b border-[#99BBFF] pb-2">呈送簽核任務</h3>
+            <div class="space-y-3 text-xs text-[#007799]">
+                <div><label class="block mb-1 text-[#0088A8]">專案名稱</label><input type="text" id="task-name" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div>
+                    <label class="block mb-1 text-[#0088A8]">任務分類</label>
+                    <select id="task-category" class="w-full p-2 border border-[#99BBFF] rounded-lg bg-white">
+                        <option value="董事會提案">董事會提案</option>
+                        <option value="合約審查">合約審查</option>
+                        <option value="工程請款">工程請款</option>
+                        <option value="行政陳核">行政陳核</option>
+                        <option value="人事報簽">人事報簽</option>
+                        <option value="財務預算">財務預算</option>
+                    </select>
+                </div>
+                <div><label class="block mb-1 text-[#0088A8]">呈送單位</label><input type="text" id="task-dept" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">負責人</label><input type="text" id="task-owner" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">截止日期</label><input type="date" id="task-deadline" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div>
+                    <label class="block mb-1 text-[#0088A8]">簽核狀態</label>
+                    <select id="task-status" class="w-full p-2 border border-[#99BBFF] rounded-lg bg-white">
+                        <option value="待簽核">待簽核</option>
+                        <option value="審核中">審核中</option>
+                        <option value="已核准">已核准</option>
+                        <option value="退件修正">退件修正</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('modal-task')" class="px-4 py-1.5 bg-slate-200 text-slate-700 text-xs rounded-lg">取消</button>
+                <button onclick="saveTask()" class="px-4 py-1.5 bg-[#00AAAA] text-white text-xs rounded-lg">儲存任務</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: 新增/編輯 專案進度 (多檔案、編輯刪除檔案、下拉分類) -->
+    <div id="modal-project" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[500px] border-2 border-[#99BBFF] shadow-xl space-y-4 max-h-[85vh] overflow-y-auto custom-scrollbar">
+            <h3 class="text-base font-medium-custom text-[#007799] border-b border-[#99BBFF] pb-2" id="project-modal-title">專案進度管理</h3>
+            <input type="hidden" id="edit-project-id">
+            <div class="space-y-3 text-xs text-[#007799]">
+                <div><label class="block mb-1 text-[#0088A8]">專案名稱</label><input type="text" id="proj-name" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div>
+                    <label class="block mb-1 text-[#0088A8]">專案分類 (下拉選單)</label>
+                    <select id="proj-category" class="w-full p-2 border border-[#99BBFF] rounded-lg bg-white">
+                        <option value="土地開發">土地開發</option>
+                        <option value="住宅建案">住宅建案</option>
+                        <option value="商業大樓">商業大樓</option>
+                        <option value="公設景觀">公設景觀</option>
+                        <option value="室內裝修">室內裝修</option>
+                        <option value="行銷企劃">行銷企劃</option>
+                        <option value="內部行政">內部行政</option>
+                    </select>
+                </div>
+                <div><label class="block mb-1 text-[#0088A8]">進度百分比 (%)</label><input type="number" id="proj-progress" min="0" max="100" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">負責團隊 / 人員</label><input type="text" id="proj-team" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">專案摘要說明</label><textarea id="proj-desc" rows="2" class="w-full p-2 border border-[#99BBFF] rounded-lg"></textarea></div>
+                
+                <!-- 檔案管理 -->
+                <div class="border-t border-[#99BBFF]/40 pt-2 space-y-2">
+                    <label class="block text-[#0088A8] font-medium-custom">上傳多個專案檔案</label>
+                    <input type="file" id="proj-file-input" multiple class="w-full p-1 border border-[#99BBFF] rounded-lg bg-white">
+                    <div id="proj-file-list" class="space-y-1 pt-1"></div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('modal-project')" class="px-4 py-1.5 bg-slate-200 text-slate-700 text-xs rounded-lg">取消</button>
+                <button onclick="saveProject()" class="px-4 py-1.5 bg-[#00AAAA] text-white text-xs rounded-lg">儲存專案</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: 新增名片 -->
+    <div id="modal-contact" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[450px] border-2 border-[#99BBFF] shadow-xl space-y-4">
+            <h3 class="text-base font-medium-custom text-[#007799] border-b border-[#99BBFF] pb-2">新增名片資料</h3>
+            <div class="space-y-3 text-xs text-[#007799]">
+                <div><label class="block mb-1 text-[#0088A8]">姓名</label><input type="text" id="cnt-name" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">公司名稱</label><input type="text" id="cnt-company" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">職稱</label><input type="text" id="cnt-title" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">手機號碼</label><input type="text" id="cnt-phone" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">Email</label><input type="text" id="cnt-email" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">助理 / 辦公室電話</label><input type="text" id="cnt-assistant" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('modal-contact')" class="px-4 py-1.5 bg-slate-200 text-slate-700 text-xs rounded-lg">取消</button>
+                <button onclick="saveContact()" class="px-4 py-1.5 bg-[#5599FF] text-white text-xs rounded-lg">儲存名片</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: 新增送禮紀錄 -->
+    <div id="modal-gift" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[450px] border-2 border-[#99BBFF] shadow-xl space-y-4">
+            <h3 class="text-base font-medium-custom text-[#007799] border-b border-[#99BBFF] pb-2">新增送禮紀錄</h3>
+            <div class="space-y-3 text-xs text-[#007799]">
+                <div><label class="block mb-1 text-[#0088A8]">節慶分類</label><input type="text" id="gft-cat" placeholder="中秋節、春節、週年慶..." class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">對象姓名</label><input type="text" id="gft-name" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">禮品內容</label><input type="text" id="gft-item" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">金額</label><input type="number" id="gft-price" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">送禮日期</label><input type="date" id="gft-date" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+                <div><label class="block mb-1 text-[#0088A8]">備註 / 謝卡狀態</label><input type="text" id="gft-note" class="w-full p-2 border border-[#99BBFF] rounded-lg"></div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('modal-gift')" class="px-4 py-1.5 bg-slate-200 text-slate-700 text-xs rounded-lg">取消</button>
+                <button onclick="saveGift()" class="px-4 py-1.5 bg-[#9999FF] text-white text-xs rounded-lg">儲存紀錄</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 4. JAVASCRIPT 邏輯核心 -->
     <script>
-        let currentTab = 'main-home';
+        // --- 核心資料狀態管理 ---
+        let currentCalDate = new Date(2026, 8, 13); // 2026-09-13
+        let selectedCalDateStr = "2026-09-13";
 
-        // 行事曆資料 (包含完整細節)
-        let scheduleData = [
-            { id: 1, title: "竹北「竹風樹海」工地現場巡視", date: "2026-09-13", time: "10:00 - 11:30", loc: "竹北工地現場", cate: "考察", note: "陪同建築師與工程總監簡報第一期進度，確認結構工程。" },
-            { id: 2, title: "與新竹縣府都發處處長午餐會報", date: "2026-09-13", time: "12:00 - 13:30", loc: "竹北喜來登", cate: "公關", note: "討論二期整體都市計畫變更時程與水資源評估。" },
-            { id: 3, title: "每週高階主管核心會報", date: "2026-09-13", time: "15:30 - 17:00", loc: "總部 10 樓會議室", cate: "會議", note: "各部門主管呈報本月 KPI 與簽核決議追蹤事項。" }
+        // 個人名片資料
+        let myProfile = {
+            name: "Alice Chen",
+            title: "董事長特助",
+            phone: "0912-345-678",
+            email: "alice.chen@truefull.com.tw",
+            avatar: ""
+        };
+
+        // 行事曆行程資料
+        let schedules = [
+            { id: 1, date: "2026-09-13", time: "09:30 - 11:00", title: "竹北樹海二期工程進度會議", location: "總部 A 會議室" },
+            { id: 2, date: "2026-09-13", time: "14:00 - 15:30", title: "與縣府都市發展處會談", location: "縣政府 3 樓" },
+            { id: 3, date: "2026-09-13", time: "16:30 - 17:30", title: "董事長行程確認與公文簽核", location: "董事長室" },
+            { id: 4, date: "2026-09-18", time: "10:00 - 12:00", title: "Q3 經營績效報告會", location: "簡報室" }
         ];
 
-        // 簽核資料
-        let tasksData = [
-            { id: 1, name: "竹北樹海二期土地變更案", cate: "土地開發", dept: "開發部", owner: "張副總", date: "2026-09-20", status: "簽核中", desc: "需呈送董事長核決開發計畫書及採購意向書內容。" },
-            { id: 2, name: "Q4 廣告聯名行銷預算案", cate: "行銷公務", dept: "企劃部", owner: "李經理", date: "2026-09-18", status: "待處理", desc: "預算規模為新台幣 350 萬元整，包含線上媒體投放與展售中心活動。" }
+        // 簽核任務資料
+        let tasks = [
+            { id: 1, name: "竹北樹海二期工程追加預算案", category: "工程請款", dept: "營建部", owner: "張總監", deadline: "2026-09-15", status: "審核中" },
+            { id: 2, name: "新竹高鐵特區土地變更審查", category: "董事會提案", dept: "開發部", owner: "王經理", deadline: "2026-09-20", status: "待簽核" },
+            { id: 3, name: "年度公關送禮採購合約", category: "合約審查", dept: "行政部", owner: "Alice Chen", deadline: "2026-09-25", status: "已核准" }
         ];
 
-        // 專案進度 (三個範本)
-        let projectsData = [
-            { id: 1, name: "竹風樹海二期開發案", progress: 65, leader: "王總監", deadline: "2026-12-31", status: "推進中", desc: "目前處於都審與地質改良階段，預計年底取得執照。" },
-            { id: 2, name: "智慧綠建築標章認證", progress: 40, leader: "陳經理", deadline: "2026-11-15", status: "審查中", desc: "提交綠建築與智慧建築雙標章申請材料。" },
-            { id: 3, name: "品牌十週年特展規劃", progress: 90, leader: "林副理", deadline: "2026-10-01", status: "收尾階段", desc: "展覽場地搭建與貴賓邀請函發送作業。" }
+        // 專案進度資料 (支援選單分類與多檔案)
+        let projects = [
+            {
+                id: 1,
+                name: "竹風樹海二期建案",
+                category: "住宅建案",
+                progress: 65,
+                team: "營建工程部",
+                desc: "規劃 24 層智慧綠建築，目前基礎工程已完成。",
+                files: [
+                    { name: "樹海二期_建築圖面_v2.pdf", size: "12.4 MB" },
+                    { name: "結構計算書.xlsx", size: "3.1 MB" }
+                ]
+            },
+            {
+                id: 2,
+                name: "高鐵特區商業大樓開發",
+                category: "商業大樓",
+                progress: 30,
+                team: "土地開發部",
+                desc: "土地都更規劃與都市計畫審議準備中。",
+                files: [
+                    { name: "土地開發評估簡報.pptx", size: "8.5 MB" }
+                ]
+            }
         ];
 
-        // 名片資料 (五個範例)
-        let contactsData = [
-            { id: 1, name: "林健一", title: "總經理", company: "宏達營造股份有限公司", phone: "0912-345-678", email: "lin@grandbuild.com", note: "長期合作優良營造廠商。" },
-            { id: 2, name: "張文華", title: "首席建築師", company: "張文華建築師事務所", phone: "0922-111-222", email: "chang@architect.tw", note: "竹風樹海一期主設計師。" },
-            { id: 3, name: "許雅婷", title: "副總裁", company: "國泰世華銀行 企業金融部", phone: "0933-444-555", email: "yating@cathay.com", note: "融資與聯貸案窗口。" },
-            { id: 4, name: "陳明哲", title: "處長", company: "新竹縣政府都市發展處", phone: "0955-666-777", email: "chen@hsinchu.gov.tw", note: "都市更新與計畫諮詢。" },
-            { id: 5, name: "黃正雄", title: "董事長", company: "雄威建材實業", phone: "0988-999-000", email: "hung@hungwei.com", note: "高級進口衛浴與建材供應商。" }
+        // 名片資料 (含有聯絡方式)
+        let contacts = [
+            { id: 1, name: "林健國", company: "新竹縣政府都市發展處", title: "處長", phone: "0933-111-222", email: "lin.county@hsinchu.gov.tw", assistant: "03-551-8101 #201" },
+            { id: 2, name: "陳智勝", company: "宏達建築師事務所", title: "主持建築師", phone: "0922-333-444", email: "architect.chen@honda.com", assistant: "02-2700-1234" },
+            { id: 3, name: "黃雅婷", company: "台灣銀行竹北分行", title: "副理", phone: "0911-888-999", email: "yating.huang@bot.com.tw", assistant: "03-657-9999" }
         ];
 
         // 節慶送禮資料
-        let giftsData = [
-            { id: 1, festival: "中秋節", name: "張處長", gift: "高級月餅禮盒", amount: "$3,200", date: "2026-09-15", status: "已送達", note: "附親筆感謝賀卡。" },
-            { id: 2, festival: "中秋節", name: "林總經理", gift: "年份紅酒雙入禮盒", amount: "$5,800", date: "2026-09-16", status: "處理中", note: "預計由司機親送至總公司。" }
+        let gifts = [
+            { id: 1, cat: "中秋節", name: "林健國 處長", item: "喜來登中秋月餅禮盒", price: 2800, date: "2026-09-10", status: "已送達", note: "對方已於 9/11 來電致謝" },
+            { id: 2, cat: "中秋節", name: "陳智勝 建築師", item: "精品紅酒禮盒", price: 3500, date: "2026-09-12", status: "處理中", note: "預計明日專人送達" }
         ];
 
-        // 備忘錄範本
-        let notesData = [
-            { id: 1, title: "董事長交辦重要事項", date: "2026-09-12", content: "1. 確認三井不動產參訪行程。<br>2. 整理竹北地號 458 號土地估價報告。" },
-            { id: 2, title: "下週例會準備重點", date: "2026-09-10", content: "彙整各部門 Q3 關鍵成效指標 (KPI) 簡報。" }
+        // 歷史備忘錄資料
+        let savedNotes = [
+            { id: 1, title: "主管交辦事項_0912", content: "1. 確認樹海二期簡報<br>2. 訂購中秋送禮" },
+            { id: 2, title: "縣府會議記錄草稿", content: "都發處對於容積獎勵無異議，需補齊環評報告。" }
         ];
 
-        // 頁籤切換
-        function switchTab(tabId) {
-            currentTab = tabId;
-            document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+        // 分類對應色彩 (專案分類不同顏色標示)
+        const categoryColors = {
+            "土地開發": "bg-[#5599FF] text-white",
+            "住宅建案": "bg-[#00AAAA] text-white",
+            "商業大樓": "bg-[#9999FF] text-white",
+            "公設景觀": "bg-emerald-500 text-white",
+            "室內裝修": "bg-amber-500 text-white",
+            "行銷企劃": "bg-rose-400 text-white",
+            "內部行政": "bg-slate-500 text-white"
+        };
 
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-[#5599FF]', 'text-white', 'shadow-sm');
-                btn.classList.add('text-[#005577]');
-            });
-            const activeBtn = document.getElementById(`btn-${tabId}`);
-            if (activeBtn) {
-                activeBtn.classList.add('bg-[#5599FF]', 'text-white', 'shadow-sm');
-                activeBtn.classList.remove('text-[#005577]');
-            }
-
-            if(tabId === 'calendar') renderCalendar();
-            if(tabId === 'tasks') renderTasks();
-            if(tabId === 'projects') renderProjects();
-            if(tabId === 'contacts') renderContacts();
-            if(tabId === 'gifts') renderGifts();
-            if(tabId === 'notepad') renderNotes();
-        }
-
-        /* ----- 行事曆模組 ----- */
-        function renderCalendar() {
-            const grid = document.getElementById('calendar-days-grid');
-            grid.innerHTML = '';
-            for(let i=1; i<=30; i++) {
-                const dayStr = i < 10 ? `0${i}` : `${i}`;
-                const isSelected = i === 13;
-                const div = document.createElement('div');
-                div.className = `p-2 rounded-xl cursor-pointer text-xs font-medium transition ${isSelected ? 'bg-[#5599FF] text-white' : 'bg-white/50 hover:bg-white/80 text-[#005577]'}`;
-                div.innerHTML = `<div>${i}</div>`;
-                div.onclick = () => selectCalendarDate(`2026-09-${dayStr}`);
-                grid.appendChild(div);
-            }
-            renderSelectedDaySchedule("2026-09-13");
-        }
-
-        function selectCalendarDate(dateStr) {
-            document.getElementById('selected-date-badge').innerText = dateStr;
-            renderSelectedDaySchedule(dateStr);
-        }
-
-        function renderSelectedDaySchedule(dateStr) {
-            const listContainer = document.getElementById('selected-day-schedule-list');
-            listContainer.innerHTML = '';
-            const filtered = scheduleData.filter(s => s.date === dateStr);
-            if(filtered.length === 0) {
-                listContainer.innerHTML = `<p class="text-xs text-slate-400 p-4 text-center">當日無排定行程。</p>`;
-                return;
-            }
-            filtered.forEach(item => {
-                const div = document.createElement('div');
-                div.className = "p-3.5 bg-white/80 backdrop-blur-md rounded-xl border border-white flex items-center justify-between shadow-sm cursor-pointer hover:bg-white transition";
-                div.innerHTML = `
-                    <div class="flex-1" onclick="viewScheduleDetail(${item.id})">
-                        <span class="bg-[#5599FF]/20 text-[#004466] px-2 py-0.5 rounded text-[10px] font-medium">${item.time}</span>
-                        <p class="text-xs font-bold text-[#004466] mt-1">${item.title}</p>
-                        <p class="text-[11px] text-[#007799] mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i>${item.loc} (${item.cate})</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="editSchedule(${item.id})" class="p-1.5 text-slate-400 hover:text-[#5599FF]"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="deleteSchedule(${item.id})" class="p-1.5 text-slate-400 hover:text-rose-500"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                `;
-                listContainer.appendChild(div);
-            });
-        }
-
-        function viewScheduleDetail(id) {
-            const item = scheduleData.find(s => s.id === id);
-            if(!item) return;
-            document.getElementById('detail-modal-title').innerText = "行程內容詳情";
-            document.getElementById('detail-modal-body').innerHTML = `
-                <div class="space-y-2 bg-white/60 p-4 rounded-xl border border-white">
-                    <p><strong class="text-[#007799]">行程標題：</strong>${item.title}</p>
-                    <p><strong class="text-[#007799]">時間：</strong>${item.date} ${item.time}</p>
-                    <p><strong class="text-[#007799]">地點：</strong>${item.loc}</p>
-                    <p><strong class="text-[#007799]">分類：</strong>${item.cate}</p>
-                    <p><strong class="text-[#007799]">備註事項：</strong>${item.note}</p>
-                </div>
-            `;
-            openModal('modal-detail-view');
-        }
-
-        function editSchedule(id) {
-            const item = scheduleData.find(s => s.id === id);
-            if(!item) return;
-            const newTitle = prompt("修改行程標題：", item.title);
-            if(newTitle) {
-                item.title = newTitle;
-                renderSelectedDaySchedule(item.date);
-            }
-        }
-
-        function deleteSchedule(id) {
-            if(confirm("確定刪除此行程？")) {
-                const item = scheduleData.find(s => s.id === id);
-                scheduleData = scheduleData.filter(s => s.id !== id);
-                if(item) renderSelectedDaySchedule(item.date);
-            }
-        }
-
-        /* ----- 簽核模組 ----- */
-        function renderTasks() {
-            const tbody = document.getElementById('task-table-body');
-            tbody.innerHTML = '';
-            tasksData.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-white/40 transition";
-                tr.innerHTML = `
-                    <td class="py-3 font-medium cursor-pointer text-[#004466] hover:text-[#5599FF]" onclick="viewTaskDetail(${item.id})">${item.name}</td>
-                    <td class="py-3">${item.cate}</td>
-                    <td class="py-3">${item.dept}</td>
-                    <td class="py-3">${item.owner}</td>
-                    <td class="py-3">${item.date}</td>
-                    <td class="py-3"><span class="px-2 py-0.5 rounded text-[10px] text-white ${item.status === '已核准' ? 'bg-emerald-500' : 'bg-amber-500'}">${item.status}</span></td>
-                    <td class="py-3 text-right">
-                        <button onclick="editTask(${item.id})" class="px-3 py-1 bg-[#5599FF] text-white rounded-lg text-[10px] hover:bg-[#4488EE]">編輯</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function viewTaskDetail(id) {
-            const item = tasksData.find(t => t.id === id);
-            if(!item) return;
-            document.getElementById('detail-modal-title').innerText = "簽核任務詳情";
-            document.getElementById('detail-modal-body').innerHTML = `
-                <div class="space-y-2 bg-white/60 p-4 rounded-xl border border-white">
-                    <p><strong class="text-[#007799]">專案名稱：</strong>${item.name}</p>
-                    <p><strong class="text-[#007799]">分類：</strong>${item.cate}</p>
-                    <p><strong class="text-[#007799]">呈送單位：</strong>${item.dept}</p>
-                    <p><strong class="text-[#007799]">負責人：</strong>${item.owner}</p>
-                    <p><strong class="text-[#007799]">截止日期：</strong>${item.date}</p>
-                    <p><strong class="text-[#007799]">說明：</strong>${item.desc}</p>
-                </div>
-            `;
-            openModal('modal-detail-view');
-        }
-
-        function editTask(id) {
-            const item = tasksData.find(t => t.id === id);
-            if(!item) return;
-            const newName = prompt("編輯專案名稱：", item.name);
-            if(newName) {
-                item.name = newName;
-                renderTasks();
-            }
-        }
-
-        /* ----- 專案模組 (3個範本) ----- */
-        function renderProjects() {
-            const container = document.getElementById('projects-container');
-            container.innerHTML = '';
-            projectsData.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "bg-white/70 backdrop-blur-md p-5 rounded-2xl shadow-sm space-y-3 border border-white flex flex-col justify-between";
-                card.innerHTML = `
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-medium bg-[#5599FF]/20 text-[#004466] px-2 py-0.5 rounded">${item.status}</span>
-                            <span class="text-xs text-[#007799]">${item.deadline} 截止</span>
-                        </div>
-                        <h4 class="font-bold text-sm text-[#004466] cursor-pointer hover:text-[#5599FF]" onclick="viewProjectDetail(${item.id})">${item.name}</h4>
-                        <p class="text-xs text-[#007799]">負責人：${item.leader}</p>
-                        <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mt-2">
-                            <div class="bg-[#5599FF] h-full" style="width: ${item.progress}%"></div>
-                        </div>
-                    </div>
-                    <div class="flex justify-end gap-2 pt-2 border-t border-white/60">
-                        <button onclick="editProject(${item.id})" class="px-2.5 py-1 text-xs text-[#005577] hover:bg-white rounded-lg">編輯</button>
-                        <button onclick="deleteProject(${item.id})" class="px-2.5 py-1 text-xs text-rose-500 hover:bg-white rounded-lg">刪除</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function viewProjectDetail(id) {
-            const item = projectsData.find(p => p.id === id);
-            if(!item) return;
-            document.getElementById('detail-modal-title').innerText = "專案進度詳情";
-            document.getElementById('detail-modal-body').innerHTML = `
-                <div class="space-y-2 bg-white/60 p-4 rounded-xl border border-white">
-                    <p><strong class="text-[#007799]">專案名稱：</strong>${item.name}</p>
-                    <p><strong class="text-[#007799]">目前進度：</strong>${item.progress}%</p>
-                    <p><strong class="text-[#007799]">負責人：</strong>${item.leader}</p>
-                    <p><strong class="text-[#007799]">預計完成日：</strong>${item.deadline}</p>
-                    <p><strong class="text-[#007799]">備註說明：</strong>${item.desc}</p>
-                </div>
-            `;
-            openModal('modal-detail-view');
-        }
-
-        function editProject(id) {
-            const item = projectsData.find(p => p.id === id);
-            if(!item) return;
-            const newName = prompt("編輯專案名稱：", item.name);
-            if(newName) {
-                item.name = newName;
-                renderProjects();
-            }
-        }
-
-        function deleteProject(id) {
-            if(confirm("確定刪除此專案？")) {
-                projectsData = projectsData.filter(p => p.id !== id);
-                renderProjects();
-            }
-        }
-
-        /* ----- 名片模組 (5個範例) ----- */
-        function renderContacts() {
-            const container = document.getElementById('contacts-container');
-            container.innerHTML = '';
-            const search = document.getElementById('contactSearch') ? document.getElementById('contactSearch').value.toLowerCase() : '';
-            const filtered = contactsData.filter(c => c.name.toLowerCase().includes(search) || c.company.toLowerCase().includes(search));
-            
-            filtered.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "bg-white/70 backdrop-blur-md p-5 rounded-2xl shadow-sm space-y-3 border border-white flex flex-col justify-between";
-                card.innerHTML = `
-                    <div class="space-y-1.5 cursor-pointer" onclick="viewContactDetail(${item.id})">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-bold text-sm text-[#004466]">${item.name} <span class="text-xs font-normal text-[#007799]">${item.title}</span></h4>
-                        </div>
-                        <p class="text-xs text-[#005577] font-medium">${item.company}</p>
-                        <p class="text-xs text-[#007799]"><i class="fa-solid fa-phone mr-1"></i>${item.phone}</p>
-                        <p class="text-xs text-[#007799]"><i class="fa-solid fa-envelope mr-1"></i>${item.email}</p>
-                    </div>
-                    <div class="flex justify-end gap-2 pt-2 border-t border-white/60">
-                        <button onclick="editContact(${item.id})" class="px-2.5 py-1 text-xs text-[#005577] hover:bg-white rounded-lg">編輯</button>
-                        <button onclick="deleteContact(${item.id})" class="px-2.5 py-1 text-xs text-rose-500 hover:bg-white rounded-lg">刪除</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function viewContactDetail(id) {
-            const item = contactsData.find(c => c.id === id);
-            if(!item) return;
-            document.getElementById('detail-modal-title').innerText = "名片詳情";
-            document.getElementById('detail-modal-body').innerHTML = `
-                <div class="space-y-2 bg-white/60 p-4 rounded-xl border border-white">
-                    <p><strong class="text-[#007799]">姓名：</strong>${item.name}</p>
-                    <p><strong class="text-[#007799]">職稱：</strong>${item.title}</p>
-                    <p><strong class="text-[#007799]">公司：</strong>${item.company}</p>
-                    <p><strong class="text-[#007799]">電話：</strong>${item.phone}</p>
-                    <p><strong class="text-[#007799]">信箱：</strong>${item.email}</p>
-                    <p><strong class="text-[#007799]">備註：</strong>${item.note}</p>
-                </div>
-            `;
-            openModal('modal-detail-view');
-        }
-
-        function editContact(id) {
-            const item = contactsData.find(c => c.id === id);
-            if(!item) return;
-            const newName = prompt("編輯姓名：", item.name);
-            if(newName) {
-                item.name = newName;
-                renderContacts();
-            }
-        }
-
-        function deleteContact(id) {
-            if(confirm("確定刪除此名片？")) {
-                contactsData = contactsData.filter(c => c.id !== id);
-                renderContacts();
-            }
-        }
-
-        /* ----- 送禮模組 ----- */
-        function renderGifts() {
-            const tbody = document.getElementById('gift-table-body');
-            tbody.innerHTML = '';
-            giftsData.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-white/40 transition";
-                tr.innerHTML = `
-                    <td class="py-3">${item.festival}</td>
-                    <td class="py-3 font-medium text-[#004466]">${item.name}</td>
-                    <td class="py-3">${item.gift}</td>
-                    <td class="py-3">${item.amount}</td>
-                    <td class="py-3">${item.date}</td>
-                    <td class="py-3"><span class="px-2 py-0.5 rounded text-[10px] bg-[#5599FF]/20 text-[#004466]">${item.status}</span></td>
-                    <td class="py-3">${item.note}</td>
-                    <td class="py-3 text-right">
-                        <button onclick="editGift(${item.id})" class="px-2 py-1 text-xs text-[#005577] hover:bg-white rounded">編輯</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function editGift(id) {
-            const item = giftsData.find(g => g.id === id);
-            if(!item) return;
-            const newGift = prompt("編輯禮品內容：", item.gift);
-            if(newGift) {
-                item.gift = newGift;
-                renderGifts();
-            }
-        }
-
-        /* ----- 記事本模組 (可編輯、可刪除備忘錄) ----- */
-        function renderNotes() {
-            const container = document.getElementById('notes-list-container');
-            container.innerHTML = '';
-            notesData.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "bg-white/80 p-4 rounded-xl shadow-sm space-y-2 border border-white flex flex-col justify-between";
-                card.innerHTML = `
-                    <div class="space-y-1">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-bold text-xs text-[#004466]">${item.title}</h4>
-                            <span class="text-[10px] text-slate-400">${item.date}</span>
-                        </div>
-                        <p class="text-xs text-[#005577] leading-relaxed">${item.content}</p>
-                    </div>
-                    <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                        <button onclick="editNote(${item.id})" class="text-[11px] text-[#005577] hover:underline">編輯</button>
-                        <button onclick="deleteNote(${item.id})" class="text-[11px] text-rose-500 hover:underline">刪除</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function saveCurrentNote() {
-            const content = document.getElementById('rich-editor').innerHTML;
-            if(!content.trim()) return alert("內容不可空白！");
-            notesData.unshift({
-                id: Date.now(),
-                title: "隨手記事",
-                date: new Date().toISOString().split('T')[0],
-                content: content
-            });
-            document.getElementById('rich-editor').innerHTML = '';
-            renderNotes();
-        }
-
-        function editNote(id) {
-            const item = notesData.find(n => n.id === id);
-            if(!item) return;
-            const newContent = prompt("編輯備忘錄內容：", item.content.replace(/<br>/g, "\n"));
-            if(newContent) {
-                item.content = newContent.replace(/\n/g, "<br>");
-                renderNotes();
-            }
-        }
-
-        function deleteNote(id) {
-            if(confirm("確定刪除此備忘錄？")) {
-                notesData = notesData.filter(n => n.id !== id);
-                renderNotes();
-            }
-        }
-
-        // Modal 控制
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
-
-        // 富文本指令
-        function execCmd(cmd, val = null) { document.execCommand(cmd, false, val); }
-
-        // 畫布功能
-        const canvas = document.getElementById('drawingCanvas');
-        if(canvas) {
-            const ctx = canvas.getContext('2d');
-            let drawing = false;
-            canvas.addEventListener('mousedown', () => drawing = true);
-            canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
-            canvas.addEventListener('mousemove', draw);
-
-            function draw(e) {
-                if(!drawing) return;
-                const rect = canvas.getBoundingClientRect();
-                ctx.lineWidth = 2;
-                ctx.lineCap = 'round';
-                ctx.strokeStyle = '#004466';
-                ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-            }
-        }
-
-        function clearCanvas() {
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
+        // --- 初始化與事件綁定 ---
         window.onload = function() {
+            initClock();
             renderCalendar();
             renderTasks();
             renderProjects();
             renderContacts();
             renderGifts();
-            renderNotes();
+            renderSavedNotesList();
+            initCanvas();
         };
+
+        // 時鐘功能
+        function initClock() {
+            function update() {
+                const now = new Date();
+                const y = now.getFullYear();
+                const m = String(now.getMonth() + 1).padStart(2, '0');
+                const d = String(now.getDate()).padStart(2, '0');
+                const days = ['日', '一', '二', '三', '四', '五', '六'];
+                const dayStr = days[now.getDay()];
+                const timeStr = now.toTimeString().split(' ')[0];
+
+                document.getElementById('clock-date').innerText = `${y}-${m}-${d} (${dayStr})`;
+                document.getElementById('clock-time').innerText = timeStr;
+            }
+            update();
+            setInterval(update, 1000);
+        }
+
+        // 分頁切換
+        function switchTab(tabId) {
+            const tabs = ['main-home', 'calendar', 'tasks', 'projects', 'contacts', 'gifts', 'notepad'];
+            tabs.forEach(t => {
+                const sec = document.getElementById('tab-' + t);
+                const btn = document.getElementById('btn-' + t);
+                if (t === tabId) {
+                    sec.classList.remove('hidden');
+                    if (btn) {
+                        btn.classList.add('bg-[#5599FF]', 'text-white', 'shadow');
+                        btn.classList.remove('text-[#007799]');
+                    }
+                } else {
+                    sec.classList.add('hidden');
+                    if (btn) {
+                        btn.classList.remove('bg-[#5599FF]', 'text-white', 'shadow');
+                        btn.classList.add('text-[#007799]');
+                    }
+                }
+            });
+        }
+
+        // --- 特助名片功能 (頭像固定與檢視) ---
+        function openProfileModal() {
+            document.getElementById('edit-profile-name').value = myProfile.name;
+            document.getElementById('edit-profile-title').value = myProfile.title;
+            document.getElementById('edit-profile-phone').value = myProfile.phone;
+            document.getElementById('edit-profile-email').value = myProfile.email;
+            document.getElementById('modal-profile').classList.remove('hidden');
+            document.getElementById('modal-profile').classList.add('flex');
+        }
+
+        function saveProfile() {
+            myProfile.name = document.getElementById('edit-profile-name').value;
+            myProfile.title = document.getElementById('edit-profile-title').value;
+            myProfile.phone = document.getElementById('edit-profile-phone').value;
+            myProfile.email = document.getElementById('edit-profile-email').value;
+
+            const fileInput = document.getElementById('profile-avatar-input');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    myProfile.avatar = e.target.result;
+                    applyProfileUI();
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                applyProfileUI();
+            }
+            closeModal('modal-profile');
+        }
+
+        function applyProfileUI() {
+            document.getElementById('profile-display-name').innerText = myProfile.name;
+            document.getElementById('profile-display-title').innerText = myProfile.title;
+            const img = document.getElementById('my-avatar-img');
+            const icon = document.getElementById('my-avatar-icon');
+            if (myProfile.avatar) {
+                img.src = myProfile.avatar;
+                img.classList.remove('hidden');
+                icon.classList.add('hidden');
+            }
+        }
+
+        function viewMyCardModal() {
+            const bodyHtml = `
+                <div class="p-4 bg-[#CCDDFF]/30 rounded-xl border border-[#99BBFF] space-y-3">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-[#5599FF] bg-white flex items-center justify-center shrink-0">
+                            ${myProfile.avatar ? `<img src="${myProfile.avatar}" class="w-full h-full object-cover">` : `<i class="fa-solid fa-user text-2xl text-[#007799]"></i>`}
+                        </div>
+                        <div>
+                            <h4 class="text-base font-medium-custom text-[#007799]">${myProfile.name}</h4>
+                            <p class="text-xs text-[#0088A8]">${myProfile.title} / 竹風建設</p>
+                        </div>
+                    </div>
+                    <div class="border-t border-[#99BBFF]/50 pt-2 space-y-1 text-xs text-[#007799]">
+                        <p><i class="fa-solid fa-mobile-screen w-5 text-[#5599FF]"></i> 手機：${myProfile.phone}</p>
+                        <p><i class="fa-regular fa-envelope w-5 text-[#5599FF]"></i> Email：${myProfile.email}</p>
+                        <p><i class="fa-solid fa-building w-5 text-[#5599FF]"></i> 公司：竹風建設 True Full Land</p>
+                    </div>
+                </div>
+            `;
+            openDetailModal("個人名片檢視", bodyHtml);
+        }
+
+        // --- 行事曆邏輯 (上下結構) ---
+        function renderCalendar() {
+            const year = currentCalDate.getFullYear();
+            const month = currentCalDate.getMonth();
+            document.getElementById('calendar-month-year-display').innerText = `${year} 年 ${String(month + 1).padStart(2, '0')} 月`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const grid = document.getElementById('calendar-days-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += `<div></div>`;
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const hasSchedule = schedules.some(s => s.date === dateStr);
+                const isSelected = dateStr === selectedCalDateStr;
+
+                grid.innerHTML += `
+                    <div onclick="selectCalDate('${dateStr}')" class="p-2 rounded-xl cursor-pointer hover:bg-[#99BBFF]/40 transition border border-transparent ${isSelected ? 'bg-[#5599FF] text-white font-medium-custom shadow-sm' : 'bg-white/60 text-[#007799]'} ${hasSchedule && !isSelected ? 'border-[#5599FF]' : ''}">
+                        ${d}
+                        ${hasSchedule ? `<div class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-[#5599FF]'} mx-auto mt-0.5"></div>` : ''}
+                    </div>
+                `;
+            }
+
+            renderDaySchedules();
+        }
+
+        function changeMonth(delta) {
+            currentCalDate.setMonth(currentCalDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function selectCalDate(dateStr) {
+            selectedCalDateStr = dateStr;
+            renderCalendar();
+        }
+
+        function renderDaySchedules() {
+            document.getElementById('selected-date-badge').innerText = selectedCalDateStr;
+            const container = document.getElementById('selected-day-schedule-list');
+            const dayList = schedules.filter(s => s.date === selectedCalDateStr);
+
+            if (dayList.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">此日期尚無排定行程</p>`;
+                return;
+            }
+
+            container.innerHTML = dayList.map(s => `
+                <div class="p-3 bg-white/70 rounded-xl border border-[#99BBFF]/60 flex items-center justify-between">
+                    <div class="space-y-0.5">
+                        <span class="text-[11px] bg-[#CCDDFF] text-[#007799] px-2 py-0.5 rounded font-mono">${s.time}</span>
+                        <h4 class="text-xs font-medium-custom text-[#007799] mt-1">${s.title}</h4>
+                        <p class="text-[11px] text-[#0088A8]"><i class="fa-solid fa-location-dot mr-1"></i>${s.location}</p>
+                    </div>
+                    <button onclick="deleteSchedule(${s.id})" class="text-slate-300 hover:text-red-400 text-xs px-2"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function openScheduleModal() {
+            document.getElementById('sched-date').value = selectedCalDateStr;
+            document.getElementById('modal-schedule').classList.remove('hidden');
+            document.getElementById('modal-schedule').classList.add('flex');
+        }
+
+        function saveSchedule() {
+            const date = document.getElementById('sched-date').value;
+            const time = document.getElementById('sched-time').value || '全天';
+            const title = document.getElementById('sched-title').value;
+            const location = document.getElementById('sched-location').value || '無點';
+
+            if (!title) return alert('請輸入行程標題');
+
+            schedules.push({ id: Date.now(), date, time, title, location });
+            selectedCalDateStr = date;
+            closeModal('modal-schedule');
+            renderCalendar();
+        }
+
+        function deleteSchedule(id) {
+            schedules = schedules.filter(s => s.id !== id);
+            renderCalendar();
+        }
+
+        // --- 簽核與決議追蹤 ---
+        function renderTasks() {
+            const tbody = document.getElementById('task-table-body');
+            tbody.innerHTML = tasks.map(t => `
+                <tr class="hover:bg-white/40 transition">
+                    <td class="p-3 font-medium-custom cursor-pointer text-[#5599FF] hover:underline" onclick="viewTaskDetail(${t.id})">${t.name}</td>
+                    <td class="p-3"><span class="bg-[#CCDDFF] text-[#007799] px-2 py-0.5 rounded text-[10px]">${t.category}</span></td>
+                    <td class="p-3">${t.dept}</td>
+                    <td class="p-3">${t.owner}</td>
+                    <td class="p-3 font-mono">${t.deadline}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] ${t.status === '已核准' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${t.status}</span></td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteTask(${t.id})" class="text-slate-300 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function viewTaskDetail(id) {
+            const t = tasks.find(item => item.id === id);
+            if (!t) return;
+            const html = `
+                <div class="space-y-2 text-xs text-[#007799]">
+                    <p><b class="text-[#0088A8]">專案名稱：</b>${t.name}</p>
+                    <p><b class="text-[#0088A8]">任務分類：</b>${t.category}</p>
+                    <p><b class="text-[#0088A8]">呈送單位：</b>${t.dept}</p>
+                    <p><b class="text-[#0088A8]">負責人：</b>${t.owner}</p>
+                    <p><b class="text-[#0088A8]">截止日期：</b>${t.deadline}</p>
+                    <p><b class="text-[#0088A8]">簽核狀態：</b>${t.status}</p>
+                </div>
+            `;
+            openDetailModal('簽核任務詳細資訊', html);
+        }
+
+        function openTaskModal() {
+            document.getElementById('modal-task').classList.remove('hidden');
+            document.getElementById('modal-task').classList.add('flex');
+        }
+
+        function saveTask() {
+            const name = document.getElementById('task-name').value;
+            const category = document.getElementById('task-category').value;
+            const dept = document.getElementById('task-dept').value;
+            const owner = document.getElementById('task-owner').value;
+            const deadline = document.getElementById('task-deadline').value;
+            const status = document.getElementById('task-status').value;
+
+            if (!name) return alert('請填寫專案名稱');
+            tasks.push({ id: Date.now(), name, category, dept, owner, deadline, status });
+            closeModal('modal-task');
+            renderTasks();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            renderTasks();
+        }
+
+        // --- 專案進度管理 (下拉選單分類與多檔案) ---
+        function renderProjects() {
+            const container = document.getElementById('projects-container');
+            container.innerHTML = projects.map(p => {
+                const badgeClass = categoryColors[p.category] || "bg-[#5599FF] text-white";
+                return `
+                    <div class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] px-2.5 py-1 rounded-full font-medium-custom ${badgeClass}">${p.category}</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="openEditProject(${p.id})" class="text-xs text-[#5599FF] hover:underline">編輯</button>
+                                <button onclick="deleteProject(${p.id})" class="text-xs text-slate-300 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+
+                        <h3 class="text-base font-medium-custom text-[#007799]">${p.name}</h3>
+                        <p class="text-xs text-[#0088A8]">${p.desc}</p>
+
+                        <!-- 進度條 -->
+                        <div>
+                            <div class="flex justify-between text-xs text-[#007799] mb-1">
+                                <span>專案進度</span>
+                                <span class="font-mono">${p.progress}%</span>
+                            </div>
+                            <div class="w-full h-2 bg-[#CCDDFF]/50 rounded-full overflow-hidden">
+                                <div class="h-full bg-[#5599FF]" style="width: ${p.progress}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- 檔案清單與下載 -->
+                        <div class="border-t border-[#99BBFF]/40 pt-2 space-y-1">
+                            <p class="text-[11px] text-[#0088A8]">附加檔案 (點擊下載)：</p>
+                            ${p.files && p.files.length > 0 ? p.files.map(f => `
+                                <div class="flex items-center justify-between text-xs bg-white/70 p-1.5 rounded border border-[#99BBFF]/40">
+                                    <a href="#" onclick="downloadDummyFile('${f.name}')" class="text-[#5599FF] hover:underline flex items-center gap-1.5 truncate max-w-[200px]">
+                                        <i class="fa-solid fa-file-arrow-down"></i> ${f.name}
+                                    </a>
+                                    <span class="text-[10px] text-slate-400 font-mono">${f.size || '1.0 MB'}</span>
+                                </div>
+                            `).join('') : '<p class="text-[11px] text-slate-400">無檔案</p>'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function downloadDummyFile(filename) {
+            alert(`已觸發檔案下載：${filename}`);
+        }
+
+        function openProjectModal() {
+            document.getElementById('edit-project-id').value = '';
+            document.getElementById('proj-name').value = '';
+            document.getElementById('proj-progress').value = 0;
+            document.getElementById('proj-team').value = '';
+            document.getElementById('proj-desc').value = '';
+            document.getElementById('proj-file-list').innerHTML = '';
+            document.getElementById('modal-project').classList.remove('hidden');
+            document.getElementById('modal-project').classList.add('flex');
+        }
+
+        function openEditProject(id) {
+            const p = projects.find(item => item.id === id);
+            if (!p) return;
+
+            document.getElementById('edit-project-id').value = p.id;
+            document.getElementById('proj-name').value = p.name;
+            document.getElementById('proj-category').value = p.category;
+            document.getElementById('proj-progress').value = p.progress;
+            document.getElementById('proj-team').value = p.team;
+            document.getElementById('proj-desc').value = p.desc;
+
+            // 渲染現有檔案與刪除按鈕
+            const fileList = document.getElementById('proj-file-list');
+            fileList.innerHTML = p.files.map((f, index) => `
+                <div class="flex items-center justify-between text-xs bg-slate-100 p-1 rounded">
+                    <span>${f.name}</span>
+                    <button onclick="removeProjectFile(${p.id}, ${index})" class="text-red-400 text-xs px-1">刪除</button>
+                </div>
+            `).join('');
+
+            document.getElementById('modal-project').classList.remove('hidden');
+            document.getElementById('modal-project').classList.add('flex');
+        }
+
+        function removeProjectFile(projId, fileIndex) {
+            const p = projects.find(item => item.id === projId);
+            if (p) {
+                p.files.splice(fileIndex, 1);
+                openEditProject(projId);
+                renderProjects();
+            }
+        }
+
+        function saveProject() {
+            const editId = document.getElementById('edit-project-id').value;
+            const name = document.getElementById('proj-name').value;
+            const category = document.getElementById('proj-category').value;
+            const progress = Number(document.getElementById('proj-progress').value) || 0;
+            const team = document.getElementById('proj-team').value;
+            const desc = document.getElementById('proj-desc').value;
+
+            if (!name) return alert('請輸入專案名稱');
+
+            const fileInput = document.getElementById('proj-file-input');
+            let newFiles = [];
+            if (fileInput.files.length > 0) {
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    newFiles.push({
+                        name: fileInput.files[i].name,
+                        size: (fileInput.files[i].size / 1024 / 1024).toFixed(1) + ' MB'
+                    });
+                }
+            }
+
+            if (editId) {
+                const p = projects.find(item => item.id == editId);
+                if (p) {
+                    p.name = name;
+                    p.category = category;
+                    p.progress = progress;
+                    p.team = team;
+                    p.desc = desc;
+                    p.files = p.files.concat(newFiles);
+                }
+            } else {
+                projects.push({
+                    id: Date.now(),
+                    name,
+                    category,
+                    progress,
+                    team,
+                    desc,
+                    files: newFiles
+                });
+            }
+
+            closeModal('modal-project');
+            renderProjects();
+        }
+
+        function deleteProject(id) {
+            projects = projects.filter(p => p.id !== id);
+            renderProjects();
+        }
+
+        // --- 名片資料管理 ---
+        function renderContacts() {
+            const search = document.getElementById('contactSearch')?.value.toLowerCase() || '';
+            const container = document.getElementById('contacts-container');
+
+            const filtered = contacts.filter(c => 
+                c.name.toLowerCase().includes(search) || 
+                c.company.toLowerCase().includes(search) ||
+                c.phone.includes(search)
+            );
+
+            container.innerHTML = filtered.map(c => `
+                <div onclick="viewContactDetail(${c.id})" class="bg-white/80 p-5 rounded-2xl border border-[#99BBFF] shadow-sm cursor-pointer hover:border-[#5599FF] transition space-y-3">
+                    <div class="flex items-center justify-between border-b border-[#99BBFF]/40 pb-2">
+                        <h3 class="text-base font-medium-custom text-[#007799]">${c.name}</h3>
+                        <span class="text-xs text-[#0088A8] bg-[#CCDDFF] px-2 py-0.5 rounded">${c.title}</span>
+                    </div>
+                    <p class="text-xs font-medium-custom text-[#0088A8]">${c.company}</p>
+                    <div class="space-y-1 text-xs text-[#007799] pt-1">
+                        <p><i class="fa-solid fa-mobile-screen w-4 text-[#5599FF]"></i> ${c.phone}</p>
+                        <p><i class="fa-regular fa-envelope w-4 text-[#5599FF]"></i> ${c.email}</p>
+                        <p><i class="fa-solid fa-phone w-4 text-[#5599FF]"></i> 助理/電話：${c.assistant || '無'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewContactDetail(id) {
+            const c = contacts.find(item => item.id === id);
+            if (!c) return;
+            const html = `
+                <div class="p-4 bg-white/60 rounded-xl space-y-2 text-xs text-[#007799]">
+                    <p><b class="text-[#0088A8]">姓名：</b>${c.name}</p>
+                    <p><b class="text-[#0088A8]">公司：</b>${c.company}</p>
+                    <p><b class="text-[#0088A8]">職稱：</b>${c.title}</p>
+                    <p><b class="text-[#0088A8]">手機號碼：</b>${c.phone}</p>
+                    <p><b class="text-[#0088A8]">電子郵件：</b>${c.email}</p>
+                    <p><b class="text-[#0088A8]">助理/公務電話：</b>${c.assistant || '未提供'}</p>
+                </div>
+            `;
+            openDetailModal('名片詳細資料', html);
+        }
+
+        function openContactModal() {
+            document.getElementById('modal-contact').classList.remove('hidden');
+            document.getElementById('modal-contact').classList.add('flex');
+        }
+
+        function saveContact() {
+            const name = document.getElementById('cnt-name').value;
+            const company = document.getElementById('cnt-company').value;
+            const title = document.getElementById('cnt-title').value;
+            const phone = document.getElementById('cnt-phone').value;
+            const email = document.getElementById('cnt-email').value;
+            const assistant = document.getElementById('cnt-assistant').value;
+
+            if (!name) return alert('請填寫姓名');
+            contacts.push({ id: Date.now(), name, company, title, phone, email, assistant });
+            closeModal('modal-contact');
+            renderContacts();
+        }
+
+        // --- 節慶送禮規劃 (點擊行檢視，無右側按鈕) ---
+        function renderGifts() {
+            const tbody = document.getElementById('gift-table-body');
+            tbody.innerHTML = gifts.map(g => `
+                <tr class="hover:bg-white/40 transition">
+                    <td class="p-3"><span class="bg-[#E8CCFF] text-[#007799] px-2 py-0.5 rounded text-[10px]">${g.cat}</span></td>
+                    <td class="p-3 font-medium-custom text-[#5599FF] cursor-pointer hover:underline" onclick="viewGiftDetail(${g.id})">${g.name}</td>
+                    <td class="p-3">${g.item}</td>
+                    <td class="p-3 font-mono">NT$ ${g.price}</td>
+                    <td class="p-3 font-mono">${g.date}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] ${g.status === '已送達' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${g.status}</span></td>
+                    <td class="p-3 text-slate-500">${g.note}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteGift(${g.id})" class="text-slate-300 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function viewGiftDetail(id) {
+            const g = gifts.find(item => item.id === id);
+            if (!g) return;
+            const html = `
+                <div class="space-y-2 text-xs text-[#007799]">
+                    <p><b class="text-[#0088A8]">節慶分類：</b>${g.cat}</p>
+                    <p><b class="text-[#0088A8]">對象姓名：</b>${g.name}</p>
+                    <p><b class="text-[#0088A8]">禮品內容：</b>${g.item}</p>
+                    <p><b class="text-[#0088A8]">金額：</b>NT$ ${g.price}</p>
+                    <p><b class="text-[#0088A8]">日期：</b>${g.date}</p>
+                    <p><b class="text-[#0088A8]">狀態：</b>${g.status}</p>
+                    <p><b class="text-[#0088A8]">備註 / 謝卡狀態：</b>${g.note}</p>
+                </div>
+            `;
+            openDetailModal('送禮紀錄詳細', html);
+        }
+
+        function openGiftModal() {
+            document.getElementById('modal-gift').classList.remove('hidden');
+            document.getElementById('modal-gift').classList.add('flex');
+        }
+
+        function saveGift() {
+            const cat = document.getElementById('gft-cat').value;
+            const name = document.getElementById('gft-name').value;
+            const item = document.getElementById('gft-item').value;
+            const price = Number(document.getElementById('gft-price').value) || 0;
+            const date = document.getElementById('gft-date').value;
+            const note = document.getElementById('gft-note').value;
+
+            if (!name) return alert('請填寫對象姓名');
+            gifts.push({ id: Date.now(), cat, name, item, price, date, status: '處理中', note });
+            closeModal('modal-gift');
+            renderGifts();
+        }
+
+        function deleteGift(id) {
+            gifts = gifts.filter(g => g.id !== id);
+            renderGifts();
+        }
+
+        // --- 記事本 (備忘錄改檔名與刪除) ---
+        function execCmd(cmd, value = null) {
+            document.execCommand(cmd, false, value);
+        }
+
+        function saveTextNote() {
+            const content = document.getElementById('rich-editor').innerHTML;
+            const title = prompt('請輸入備忘錄標題：', `備忘錄_${new Date().toLocaleDateString()}`);
+            if (title) {
+                savedNotes.push({ id: Date.now(), title, content });
+                renderSavedNotesList();
+            }
+        }
+
+        function renderSavedNotesList() {
+            const container = document.getElementById('saved-notes-list');
+            container.innerHTML = savedNotes.map(n => `
+                <div class="p-2 bg-white/80 rounded-xl border border-[#99BBFF] flex items-center gap-2 text-xs text-[#007799]">
+                    <span class="cursor-pointer hover:underline font-medium-custom" onclick="loadNote(${n.id})">${n.title}</span>
+                    <button onclick="renameNote(${n.id})" class="text-slate-400 hover:text-[#5599FF]"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="deleteNote(${n.id})" class="text-slate-400 hover:text-red-400"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function loadNote(id) {
+            const note = savedNotes.find(n => n.id === id);
+            if (note) {
+                document.getElementById('rich-editor').innerHTML = note.content;
+            }
+        }
+
+        function renameNote(id) {
+            const note = savedNotes.find(n => n.id === id);
+            if (note) {
+                const newTitle = prompt('修改備忘錄檔名：', note.title);
+                if (newTitle) {
+                    note.title = newTitle;
+                    renderSavedNotesList();
+                }
+            }
+        }
+
+        function deleteNote(id) {
+            savedNotes = savedNotes.filter(n => n.id !== id);
+            renderSavedNotesList();
+        }
+
+        // --- 數位手繪板 (校正滑鼠游標座標) ---
+        let canvas, ctx;
+        let isDrawing = false;
+
+        function initCanvas() {
+            canvas = document.getElementById('drawingCanvas');
+            ctx = canvas.getContext('2d');
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+        }
+
+        function getCanvasPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const pos = getCanvasPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const pos = getCanvasPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.strokeStyle = document.getElementById('brushColor').value;
+            ctx.lineWidth = document.getElementById('brushSize').value;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function downloadCanvas() {
+            const link = document.createElement('a');
+            link.download = '手繪簽名備忘.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // --- 全域搜尋與 Modal 輔助 ---
+        function handleGlobalSearch() {
+            const q = document.getElementById('globalSearchInput').value.toLowerCase();
+            const dropdown = document.getElementById('search-results-dropdown');
+
+            if (!q) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+
+            let results = [];
+            tasks.filter(t => t.name.toLowerCase().includes(q)).forEach(t => results.push({ type: '簽核任務', title: t.name, tab: 'tasks' }));
+            projects.filter(p => p.name.toLowerCase().includes(q)).forEach(p => results.push({ type: '專案', title: p.name, tab: 'projects' }));
+            contacts.filter(c => c.name.toLowerCase().includes(q) || c.company.toLowerCase().includes(q)).forEach(c => results.push({ type: '名片', title: `${c.name} (${c.company})`, tab: 'contacts' }));
+
+            if (results.length === 0) {
+                dropdown.innerHTML = `<p class="text-xs text-slate-400 p-2 text-center">未搜尋到相關項目</p>`;
+            } else {
+                dropdown.innerHTML = results.map(r => `
+                    <div onclick="switchTab('${r.tab}'); document.getElementById('search-results-dropdown').classList.add('hidden');" class="p-2 hover:bg-[#CCDDFF]/40 rounded-lg cursor-pointer text-xs text-[#007799] flex justify-between">
+                        <span>${r.title}</span>
+                        <span class="text-[10px] text-[#0088A8] bg-white px-1.5 py-0.5 rounded border border-[#99BBFF]">${r.type}</span>
+                    </div>
+                `).join('');
+            }
+            dropdown.classList.remove('hidden');
+        }
+
+        function openDetailModal(title, html) {
+            document.getElementById('detail-modal-title').innerText = title;
+            document.getElementById('detail-modal-body').innerHTML = html;
+            document.getElementById('modal-detail-view').classList.remove('hidden');
+            document.getElementById('modal-detail-view').classList.add('flex');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.getElementById(modalId).classList.remove('flex');
+        }
     </script>
 </body>
 </html>
