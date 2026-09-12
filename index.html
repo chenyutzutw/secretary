@@ -1,531 +1,1364 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>行政主管儀表板</title>
-  
-  <!-- 1. 修正 Icon 顯示問題：引入最新且穩定的 Font Awesome CDN -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
-  <style>
-    /* 1. 統一全域字體（繁體中文系統優化） */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", "Microsoft JhengHei", sans-serif !important;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高階主管特助儀表板</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 圖示庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        custom: {
+                            bg1: '#CCDDFF',
+                            bg2: '#CCCCFF',
+                            bg3: '#E8CCFF',
+                            accent1: '#99BBFF',
+                            accent2: '#9999FF',
+                            accent3: '#5599FF',
+                            text1: '#009FCC',
+                            text2: '#0088A8',
+                            text3: '#007799',
+                            text4: '#00AAAA'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 統一全域背景顏色，無多餘分區線條 */
+        body { background-color: #CCDDFF; color: #007799; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #5599FF; border-radius: 4px; }
+        
+        /* 繪圖板 Canvas 容器樣式 */
+        .canvas-container { 
+            position: relative; 
+            width: 100%; 
+            height: 320px; 
+            border-radius: 12px; 
+            background: #ffffff; 
+            touch-action: none; 
+        }
+        canvas { width: 100%; height: 100%; display: block; }
 
-    body {
-      background-color: #f3f4f6;
-      color: #1f2937;
-      padding: 20px;
-    }
-
-    .dashboard-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 20px;
-    }
-
-    /* 標題與主管動態列 */
-    .header-bar {
-      grid-column: 1 / -1;
-      background: #ffffff;
-      padding: 16px 24px;
-      border-radius: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid #e5e7eb;
-    }
-
-    .header-title {
-      font-size: 1.25rem;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* 右上角主管動態狀態標籤 */
-    .leader-status-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.95rem;
-      font-weight: 500;
-    }
-
-    .status-badge {
-      padding: 6px 14px;
-      border-radius: 20px;
-      color: #ffffff;
-      font-size: 0.875rem;
-      font-weight: 600;
-      transition: background-color 0.3s ease;
-    }
-
-    /* 區塊通用樣式 */
-    .card {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 20px;
-      border: 1px solid #e5e7eb;
-    }
-
-    .card-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* 2. 四大 KPI 區域：全面移除陰影 */
-    .kpi-grid {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-
-    .kpi-card {
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 16px;
-      border: 1px solid #e5e7eb;
-      /* 無陰影 */
-      box-shadow: none !important;
-      text-shadow: none !important;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .kpi-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      color: #ffffff;
-    }
-
-    .kpi-info .kpi-value {
-      font-size: 1.5rem;
-      font-weight: bold;
-      line-height: 1.2;
-    }
-
-    .kpi-info .kpi-label {
-      font-size: 0.85rem;
-      color: #6b7280;
-      margin-top: 4px;
-    }
-
-    /* 主頁左側內容 */
-    .main-left {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* 事件列表 (可點擊) */
-    .event-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .event-item {
-      padding: 12px 16px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer; /* 顯示為可點擊 */
-      transition: background-color 0.2s ease;
-    }
-
-    .event-item:hover {
-      background-color: #f9fafb;
-    }
-
-    .event-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .event-time {
-      font-size: 0.85rem;
-      background: #eff6ff;
-      color: #2563eb;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: 500;
-    }
-
-    /* 3. 萬年曆樣式 (箭頭左右) */
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .calendar-nav-btn {
-      background: none;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      width: 32px;
-      height: 32px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #374151;
-    }
-
-    .calendar-nav-btn:hover {
-      background: #f3f4f6;
-    }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-      text-align: center;
-      font-size: 0.875rem;
-    }
-
-    .calendar-day-header {
-      font-weight: 600;
-      color: #6b7280;
-      padding: 6px 0;
-    }
-
-    .calendar-day {
-      padding: 8px 0;
-      border-radius: 6px;
-      color: #374151;
-    }
-
-    .calendar-day.active {
-      background: #2563eb;
-      color: #ffffff;
-      font-weight: bold;
-    }
-
-    .calendar-day.muted {
-      color: #d1d5db;
-    }
-
-    /* 4. 文字備忘錄 */
-    .memo-textarea {
-      width: 100%;
-      height: 140px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 0.95rem;
-      resize: vertical;
-      outline: none;
-    }
-
-    .memo-textarea:focus {
-      border-color: #2563eb;
-    }
-
-    /* 事件檢視彈窗 Modal */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background: #ffffff;
-      padding: 24px;
-      border-radius: 12px;
-      max-width: 450px;
-      width: 90%;
-    }
-
-    .modal-header {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-body p {
-      margin-bottom: 8px;
-      color: #4b5563;
-      line-height: 1.5;
-    }
-
-    .modal-close-btn {
-      margin-top: 16px;
-      padding: 8px 16px;
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      float: right;
-    }
-  </style>
+        /* 四大 KPI 特效陰影 (#9999FF 與 #99BBFF 漸層陰影) */
+        .kpi-card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(153, 153, 255, 0.4), 0 8px 10px -6px rgba(153, 187, 255, 0.4) !important;
+        }
+    </style>
 </head>
-<body>
+<body class="font-sans antialiased flex h-screen overflow-hidden bg-[#CCDDFF]">
 
-  <div class="dashboard-container">
-    
-    <!-- Header 區域：含主管動態 -->
-    <header class="header-bar">
-      <div class="header-title">
-        <i class="fa-solid fa-chart-line" style="color: #2563eb;"></i>
-        行政管理綜合儀表板
-      </div>
-      <!-- 右上角主管動態 -->
-      <div class="leader-status-box">
-        <span><i class="fa-solid fa-user-tie"></i> 主管當前動態：</span>
-        <span id="leaderStatusBadge" class="status-badge" style="background-color: #10b981;">載入中...</span>
-      </div>
-    </header>
-
-    <!-- 2. 四大 KPI (無陰影邊框樣式) -->
-    <section class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background-color: #2563eb;">
-          <i class="fa-solid fa-file-signature"></i>
-        </div>
-        <div class="kpi-info">
-          <div class="kpi-value">18 件</div>
-          <div class="kpi-label">待簽核公文</div>
-        </div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background-color: #10b981;">
-          <i class="fa-solid fa-calendar-check"></i>
-        </div>
-        <div class="kpi-info">
-          <div class="kpi-value">5 場</div>
-          <div class="kpi-label">今日預定會議</div>
-        </div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background-color: #f59e0b;">
-          <i class="fa-solid fa-users"></i>
-        </div>
-        <div class="kpi-info">
-          <div class="kpi-value">94 %</div>
-          <div class="kpi-label">部門今日出勤率</div>
-        </div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background-color: #ef4444;">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-        </div>
-        <div class="kpi-info">
-          <div class="kpi-value">2 項</div>
-          <div class="kpi-label">列管異常事件</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 主頁左側：事件列表 -->
-    <main class="main-left">
-      <div class="card">
-        <div class="card-title">
-          <i class="fa-solid fa-list-check" style="color: #2563eb;"></i>
-          今日與近期重點日程事件（點擊可檢視詳情）
-        </div>
-        <div class="event-list">
-          <div class="event-item" 
-               data-title="主管晨報與各組會報" 
-               data-time="09:00 - 10:30" 
-               data-location="第一會議室" 
-               data-desc="檢討本周 KPIs 以及追蹤跨部門公文簽核進度。">
-            <div class="event-info">
-              <span class="event-time">09:00 - 10:30</span>
-              <span>主管晨報與各組會報</span>
+    <!-- 1. 左側邊欄 Navigation -->
+    <aside class="w-64 bg-[#CCDDFF] text-[#007799] flex flex-col justify-between shrink-0">
+        <div>
+            <!-- Logo 區域 -->
+            <div class="h-16 flex items-center px-6 font-bold text-lg text-[#007799] gap-3">
+                <div class="w-8 h-8 rounded-lg bg-[#5599FF] flex items-center justify-center text-white shadow">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <span class="tracking-wide font-extrabold text-[#007799]">EA Management</span>
             </div>
-            <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 0.8rem;"></i>
-          </div>
 
-          <div class="event-item" 
-               data-title="系統資安防護專案審查" 
-               data-time="11:00 - 12:00" 
-               data-location="線上 Teams 會議" 
-               data-desc="審查外部廠商送交之資安弱點掃描報告與修補時程。">
-            <div class="event-info">
-              <span class="event-time">11:00 - 12:00</span>
-              <span>系統資安防護專案審查</span>
+            <!-- 主選單：第一個改為 "主頁" -->
+            <nav class="p-4 space-y-2">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition bg-[#5599FF] text-white shadow">
+                    <i class="fa-solid fa-house w-5"></i> 主頁
+                </button>
+                <button onclick="switchTab('tasks')" id="btn-tasks" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-[#007799] hover:bg-[#99BBFF]/40 transition">
+                    <i class="fa-solid fa-list-check w-5"></i> 簽核與決議追蹤
+                </button>
+                <button onclick="switchTab('projects')" id="btn-projects" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-[#007799] hover:bg-[#99BBFF]/40 transition">
+                    <i class="fa-solid fa-diagram-project w-5"></i> 專案進度
+                </button>
+                <button onclick="switchTab('contacts')" id="btn-contacts" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-[#007799] hover:bg-[#99BBFF]/40 transition">
+                    <i class="fa-solid fa-address-book w-5"></i> 名片資料
+                </button>
+                <button onclick="switchTab('gifts')" id="btn-gifts" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-[#007799] hover:bg-[#99BBFF]/40 transition">
+                    <i class="fa-solid fa-gift w-5"></i> 節慶送禮規劃
+                </button>
+                <button onclick="switchTab('notepad')" id="btn-notepad" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-[#007799] hover:bg-[#99BBFF]/40 transition">
+                    <i class="fa-solid fa-pen-to-square w-5"></i> 記事本
+                </button>
+            </nav>
+        </div>
+
+        <!-- 左下角個人名片 (點擊頭像編輯/上傳照片固定；點擊名字開啟檢視 modal) -->
+        <div class="p-4 flex items-center gap-3 bg-[#CCDDFF]">
+            <div class="relative w-12 h-12 rounded-full overflow-hidden bg-[#5599FF] flex items-center justify-center shrink-0 cursor-pointer group" onclick="openProfileEditModal()" title="點擊上傳/變更頭像">
+                <img id="avatar-preview" src="" class="w-full h-full object-cover hidden">
+                <i id="avatar-placeholder" class="fa-solid fa-user text-white text-xl"></i>
+                <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center text-white text-[10px]">編輯</div>
             </div>
-            <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 0.8rem;"></i>
-          </div>
-
-          <div class="event-item" 
-               data-title="跨部門業務協調會" 
-               data-time="14:00 - 16:00" 
-               data-location="第二簡報室" 
-               data-desc="研商下季度人力預算與設備採購流程優化案。">
-            <div class="event-info">
-              <span class="event-time">14:00 - 16:00</span>
-              <span>跨部門業務協調會</span>
+            <div class="text-xs cursor-pointer" onclick="viewProfileModal()">
+                <p class="font-extrabold text-[#007799] text-sm hover:underline" id="profile-display-name">Alice Chen</p>
+                <p class="text-[#0088A8] font-bold" id="profile-display-title">董事長秘書</p>
             </div>
-            <i class="fa-solid fa-chevron-right" style="color: #9ca3af; font-size: 0.8rem;"></i>
-          </div>
         </div>
-      </div>
-    </main>
-
-    <!-- 主頁右側：萬年曆與文字備忘錄 -->
-    <aside style="display: flex; flex-direction: column; gap: 20px;">
-      
-      <!-- 3. 萬年曆（箭頭已修改為朝向左右） -->
-      <div class="card">
-        <div class="calendar-header">
-          <!-- 左右箭頭按鈕 -->
-          <button class="calendar-nav-btn" id="prevMonth"><i class="fa-solid fa-chevron-left"></i></button>
-          <div style="font-weight: bold;" id="calendarMonthTitle">2026 年 9 月</div>
-          <button class="calendar-nav-btn" id="nextMonth"><i class="fa-solid fa-chevron-right"></i></button>
-        </div>
-        <div class="calendar-grid">
-          <div class="calendar-day-header">日</div>
-          <div class="calendar-day-header">一</div>
-          <div class="calendar-day-header">二</div>
-          <div class="calendar-day-header">三</div>
-          <div class="calendar-day-header">四</div>
-          <div class="calendar-day-header">五</div>
-          <div class="calendar-day-header">六</div>
-          
-          <!-- 日期靜態預覽範例 -->
-          <div class="calendar-day muted">30</div>
-          <div class="calendar-day">1</div>
-          <div class="calendar-day">2</div>
-          <div class="calendar-day">3</div>
-          <div class="calendar-day">4</div>
-          <div class="calendar-day">5</div>
-          <div class="calendar-day">6</div>
-          <div class="calendar-day">7</div>
-          <div class="calendar-day">8</div>
-          <div class="calendar-day">9</div>
-          <div class="calendar-day">10</div>
-          <div class="calendar-day">11</div>
-          <div class="calendar-day">12</div>
-          <div class="calendar-day active">13</div>
-          <div class="calendar-day">14</div>
-          <div class="calendar-day">15</div>
-          <div class="calendar-day">16</div>
-          <div class="calendar-day">17</div>
-          <div class="calendar-day">18</div>
-          <div class="calendar-day">19</div>
-        </div>
-      </div>
-
-      <!-- 4. 文字備忘錄：已清除預設提示文字 -->
-      <div class="card">
-        <div class="card-title">
-          <i class="fa-regular fa-note-sticky" style="color: #f59e0b;"></i>
-          隨手筆記 / 備忘錄
-        </div>
-        <textarea class="memo-textarea" placeholder=""></textarea>
-      </div>
-
     </aside>
 
-  </div>
+    <!-- 2. 主內容區域 -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden bg-[#CCDDFF]">
+        
+        <!-- 頂部 Header -->
+        <header class="h-16 bg-[#CCDDFF] px-6 flex items-center justify-between shrink-0">
+            <div class="relative w-96">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#0088A8] text-sm"></i>
+                <input type="text" placeholder="搜尋行程、名片或專案..." class="w-full pl-9 pr-4 py-1.5 text-sm bg-white/80 text-[#007799] font-bold rounded-xl focus:outline-none">
+            </div>
 
-  <!-- 事件檢視彈窗 Modal -->
-  <div class="modal-overlay" id="eventModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span id="modalTitle">事件名稱</span>
-        <i class="fa-solid fa-xmark" style="cursor: pointer; color: #9ca3af;" onclick="closeModal()"></i>
-      </div>
-      <div class="modal-body">
-        <p><strong><i class="fa-regular fa-clock"></i> 時間：</strong><span id="modalTime"></span></p>
-        <p><strong><i class="fa-solid fa-location-dot"></i> 地點：</strong><span id="modalLocation"></span></p>
-        <p><strong><i class="fa-regular fa-file-lines"></i> 說明：</strong><span id="modalDesc"></span></p>
-      </div>
-      <button class="modal-close-btn" onclick="closeModal()">關閉</button>
+            <!-- 主管實時動態狀態 -->
+            <div class="flex items-center gap-4">
+                <div id="boss-status-badge" class="flex items-center gap-2 text-xs px-4 py-1.5 rounded-full font-bold bg-white/80 shadow-sm">
+                    <span id="boss-status-dot" class="w-3 h-3 rounded-full animate-pulse bg-emerald-400"></span>
+                    <span id="boss-status-text" class="text-[#007799]">主管目前狀態：[空閒/辦公中] 可預約呈核</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 動態內容展示區 -->
+        <main class="flex-1 p-6 overflow-y-auto custom-scrollbar bg-[#CCDDFF]">
+
+            <!-- TAB 1: 主頁 (包含 KPI、上下排列行事曆) -->
+            <section id="tab-dashboard" class="space-y-6">
+                
+                <!-- 四大 KPI 卡片 (陰影顏色 #9999FF 與 #99BBFF) -->
+                <div class="grid grid-cols-4 gap-4">
+                    <div onclick="switchTab('dashboard')" class="bg-white p-4 rounded-2xl kpi-card-shadow hover:scale-[1.02] transition cursor-pointer border-l-8 border-l-[#5599FF]">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-[#0088A8]">今日主管行程</p>
+                                <p class="text-2xl font-black text-[#007799] mt-1" id="kpi-today-count">3 場會議</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-[#CCDDFF] text-[#007799] flex items-center justify-center text-lg"><i class="fa-regular fa-calendar"></i></div>
+                        </div>
+                    </div>
+
+                    <div onclick="switchTab('tasks')" class="bg-white p-4 rounded-2xl kpi-card-shadow hover:scale-[1.02] transition cursor-pointer border-l-8 border-l-[#FFBB66]">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-[#0088A8]">待追蹤簽核</p>
+                                <p class="text-2xl font-black text-[#007799] mt-1" id="kpi-task-count">2 件待辦</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-[#E8CCFF] text-[#007799] flex items-center justify-center text-lg"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                        </div>
+                    </div>
+
+                    <div onclick="switchTab('projects')" class="bg-white p-4 rounded-2xl kpi-card-shadow hover:scale-[1.02] transition cursor-pointer border-l-8 border-l-[#00AAAA]">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-[#0088A8]">進行中專案</p>
+                                <p class="text-2xl font-black text-[#007799] mt-1" id="kpi-project-count">2 項專案</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-[#CCDDFF] text-[#007799] flex items-center justify-center text-lg"><i class="fa-solid fa-diagram-project"></i></div>
+                        </div>
+                    </div>
+
+                    <div onclick="switchTab('gifts')" class="bg-white p-4 rounded-2xl kpi-card-shadow hover:scale-[1.02] transition cursor-pointer border-l-8 border-l-[#9999FF]">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-[#0088A8]">送禮規劃進度</p>
+                                <p class="text-2xl font-black text-[#007799] mt-1">100% 已紀錄</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-[#E8CCFF] text-[#007799] flex items-center justify-center text-lg"><i class="fa-solid fa-gift"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 行事曆改為上下排列：上月曆，下詳細行程列表 -->
+                <div class="space-y-6">
+                    
+                    <!-- 上方：當月月曆 -->
+                    <div class="bg-white p-5 rounded-2xl shadow space-y-4">
+                        <div class="flex items-center justify-between pb-2">
+                            <h3 class="font-bold text-lg text-[#007799] flex items-center gap-2">
+                                <i class="fa-regular fa-calendar-days text-[#5599FF]"></i> <span id="current-month-title">2026 年 9 月</span>
+                            </h3>
+                            <button onclick="openScheduleModal()" class="px-4 py-2 bg-[#5599FF] text-white rounded-xl text-xs font-bold hover:bg-[#9999FF] transition">+ 排定新行程</button>
+                        </div>
+                        
+                        <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-[#0088A8]">
+                            <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-[#007799]" id="calendar-grid">
+                            <!-- JS 動態帶入月曆 -->
+                        </div>
+                    </div>
+
+                    <!-- 下方：詳細行程列表 -->
+                    <div class="bg-white p-5 rounded-2xl shadow space-y-4">
+                        <div class="flex items-center justify-between border-b pb-3">
+                            <h3 class="font-extrabold text-lg text-[#007799] flex items-center gap-2">
+                                <i class="fa-solid fa-list-ul text-[#00AAAA]"></i> 詳細行程列表
+                            </h3>
+                            <span class="text-xs bg-[#99BBFF]/40 text-[#007799] font-black px-3 py-1 rounded-full" id="current-date-badge">2026-09-12</span>
+                        </div>
+
+                        <div class="space-y-3" id="schedule-list-container">
+                            <!-- JS 動態帶入列表 -->
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- TAB 2: 簽核與決議追蹤 -->
+            <section id="tab-tasks" class="hidden space-y-6">
+                <div class="flex items-center justify-between bg-white p-4 rounded-2xl shadow">
+                    <h2 class="text-xl font-extrabold text-[#007799]">簽核與決議追蹤</h2>
+                    <button onclick="openTaskModal()" class="px-4 py-2 bg-[#5599FF] text-white text-sm font-bold rounded-xl hover:bg-[#9999FF] transition">+ 新增任務</button>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="text-[#0088A8] bg-[#CCDDFF]/40">
+                                <th class="p-3 font-extrabold">專案名稱 (點擊檢視)</th>
+                                <th class="p-3 font-extrabold">分類</th>
+                                <th class="p-3 font-extrabold">呈送單位</th>
+                                <th class="p-3 font-extrabold">負責人</th>
+                                <th class="p-3 font-extrabold">截止日</th>
+                                <th class="p-3 font-extrabold">簽核狀態</th>
+                                <th class="p-3 font-extrabold">備註說明</th>
+                                <th class="p-3 font-extrabold text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="task-table-body" class="divide-y divide-slate-100 text-[#007799] font-bold">
+                            <!-- JS 動態帶入 -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 3: 專案進度 (支援多檔案編輯、刪除與下拉選單) -->
+            <section id="tab-projects" class="hidden space-y-6">
+                <div class="flex items-center justify-between bg-white p-4 rounded-2xl shadow">
+                    <h2 class="text-xl font-extrabold text-[#007799]">專案進度控管</h2>
+                    <button onclick="openProjectModal()" class="px-4 py-2 bg-[#00AAAA] text-white text-sm font-bold rounded-xl hover:bg-[#0088A8] transition">+ 新增專案</button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6" id="projects-container">
+                    <!-- JS 動態生成專案卡片 -->
+                </div>
+            </section>
+
+            <!-- TAB 4: 名片資料 (含手機, Email, 助理電話) -->
+            <section id="tab-contacts" class="hidden space-y-6">
+                <div class="flex items-center justify-between bg-white p-4 rounded-2xl shadow">
+                    <h2 class="text-xl font-extrabold text-[#007799]">名片資料</h2>
+                    <button onclick="openContactModal()" class="px-4 py-2 bg-[#5599FF] text-white text-sm font-bold rounded-xl hover:bg-[#9999FF] transition">+ 新增名片</button>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl shadow flex items-center gap-4">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#0088A8] text-sm"></i>
+                        <input type="text" id="contactSearch" oninput="renderContacts()" placeholder="搜尋姓名、公司、手機、Email 或場合..." class="w-full pl-9 pr-4 py-2 text-sm bg-[#CCDDFF]/20 text-[#007799] font-bold rounded-xl">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6" id="contacts-container">
+                    <!-- JS 動態生成名片 -->
+                </div>
+            </section>
+
+            <!-- TAB 5: 節慶送禮規劃 (點擊直接檢視) -->
+            <section id="tab-gifts" class="hidden space-y-6">
+                <div class="flex items-center justify-between bg-white p-4 rounded-2xl shadow">
+                    <h2 class="text-xl font-extrabold text-[#007799]">節慶與公關送禮規劃</h2>
+                    <button onclick="openGiftModal()" class="px-4 py-2 bg-[#9999FF] text-white text-sm font-bold rounded-xl hover:bg-[#5599FF] transition">+ 新增送禮紀錄</button>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="text-[#0088A8] bg-[#CCDDFF]/40">
+                                <th class="p-3 font-extrabold">節慶分類</th>
+                                <th class="p-3 font-extrabold">對象姓名 (點擊檢視)</th>
+                                <th class="p-3 font-extrabold">禮品內容</th>
+                                <th class="p-3 font-extrabold">預估金額</th>
+                                <th class="p-3 font-extrabold">預計/送達日期</th>
+                                <th class="p-3 font-extrabold">是否送達</th>
+                                <th class="p-3 font-extrabold text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gift-table-body" class="divide-y divide-slate-100 text-[#007799] font-bold">
+                            <!-- JS 動態帶入 -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 6: 記事本 (歷史備忘錄可改名/刪除，修復繪圖板鼠標偏離) -->
+            <section id="tab-notepad" class="hidden space-y-6">
+                <div class="flex items-center justify-between bg-white p-4 rounded-2xl shadow">
+                    <h2 class="text-xl font-extrabold text-[#007799]">數位手繪與文字記事本</h2>
+                    <button onclick="clearCanvas()" class="px-4 py-2 bg-[#FF8888] text-white text-sm font-bold rounded-xl hover:bg-red-500 transition"><i class="fa-solid fa-eraser mr-1"></i> 清空畫布</button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-6">
+                    <!-- 左側：歷史備忘錄列表 (可點擊更改檔名或刪除) -->
+                    <div class="bg-white p-5 rounded-2xl shadow space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-extrabold text-[#007799]"><i class="fa-solid fa-folder-open text-[#5599FF] mr-2"></i>歷史備忘錄</h3>
+                            <button onclick="addNewNote()" class="text-xs bg-[#5599FF] text-white px-2 py-1 rounded font-bold">+ 新增筆記</button>
+                        </div>
+                        <div id="notes-list" class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar">
+                            <!-- JS 動態帶入備忘錄 -->
+                        </div>
+                    </div>
+
+                    <!-- 中間：文字編輯區 -->
+                    <div class="bg-white p-5 rounded-2xl shadow space-y-3">
+                        <h3 class="font-extrabold text-[#007799]" id="current-note-title"><i class="fa-solid fa-align-left text-[#5599FF] mr-2"></i>文字內容</h3>
+                        <textarea id="notepad-text" oninput="saveCurrentNoteContent()" class="w-full h-72 p-3 bg-[#CCDDFF]/20 rounded-xl text-xs font-bold text-[#007799] focus:outline-none" placeholder="在此自由輸入筆記..."></textarea>
+                    </div>
+
+                    <!-- 右側：手繪與簽名畫布 (精準滑鼠位置與相應觸控修正) -->
+                    <div class="bg-white p-5 rounded-2xl shadow space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-extrabold text-[#007799]"><i class="fa-solid fa-palette text-[#00AAAA] mr-2"></i>繪圖簽名板</h3>
+                            <div class="flex items-center gap-2 text-xs">
+                                <input type="color" id="brushColor" value="#007799" class="w-6 h-6 border-0 rounded cursor-pointer">
+                            </div>
+                        </div>
+                        <div class="canvas-container overflow-hidden" id="canvas-wrapper">
+                            <canvas id="drawingCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
     </div>
-  </div>
 
-  <script>
-    // 5. 主頁下方事件點擊並檢視詳情
-    document.querySelectorAll('.event-item').forEach(item => {
-      item.addEventListener('click', function() {
-        document.getElementById('modalTitle').innerText = this.dataset.title;
-        document.getElementById('modalTime').innerText = this.dataset.time;
-        document.getElementById('modalLocation').innerText = this.dataset.location;
-        document.getElementById('modalDesc').innerText = this.dataset.desc;
-        document.getElementById('eventModal').style.display = 'flex';
-      });
-    });
+    <!-- MODALS 集合 -->
 
-    function closeModal() {
-      document.getElementById('eventModal').style.display = 'none';
-    }
+    <!-- Modal: 個人特助名片 檢視 Modal -->
+    <div id="modal-profile-view" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[400px] shadow-2xl space-y-4 relative">
+            <button onclick="closeModal('modal-profile-view')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="text-center space-y-2">
+                <div class="w-20 h-20 rounded-full overflow-hidden bg-[#5599FF] mx-auto flex items-center justify-center shadow">
+                    <img id="view-profile-img" src="" class="w-full h-full object-cover hidden">
+                    <i id="view-profile-placeholder" class="fa-solid fa-user text-white text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-black text-[#007799]" id="view-profile-name">Alice Chen</h3>
+                <p class="text-xs font-bold text-[#0088A8]" id="view-profile-title">董事長秘書</p>
+            </div>
+            <div class="bg-[#CCDDFF]/20 p-4 rounded-xl space-y-2 text-xs font-bold text-[#007799]">
+                <p><i class="fa-solid fa-phone mr-2 text-[#5599FF]"></i><span id="view-profile-phone">02-2700-8888 #101</span></p>
+                <p><i class="fa-solid fa-envelope mr-2 text-[#5599FF]"></i><span id="view-profile-email">alice.chen@company.com</span></p>
+            </div>
+        </div>
+    </div>
 
-    // 6. 右上角主管動態：根據行事曆日程時間變更狀態
-    // 定義主管今天的行事曆日程設定
-    const leaderSchedule = [
-      { start: "09:00", end: "10:30", status: "主管晨報中", color: "#ef4444" }, // 紅色：會議中
-      { start: "11:00", end: "12:00", status: "專案審查中", color: "#f59e0b" }, // 黃色：審查中
-      { start: "14:00", end: "16:00", status: "跨部門會報", color: "#3b82f6" }  // 藍色：外會/行程
-    ];
+    <!-- Modal: 編輯個人特助頭像與資料 -->
+    <div id="modal-profile-edit" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[450px] shadow-2xl space-y-4">
+            <h3 class="text-lg font-extrabold text-[#007799] border-b pb-2">編輯個人資料與頭像</h3>
+            <div class="space-y-3 text-xs font-bold text-[#007799]">
+                <div>
+                    <label class="block mb-1">上傳大頭貼照片 (固定不消失)</label>
+                    <input type="file" id="profile-avatar-input" accept="image/*" class="w-full p-2 rounded-lg bg-[#CCDDFF]/20">
+                </div>
+                <div><label class="block mb-1">姓名</label><input type="text" id="edit-profile-name" value="Alice Chen" class="w-full p-2 border rounded-lg"></div>
+                <div><label class="block mb-1">職稱</label><input type="text" id="edit-profile-title" value="董事長秘書" class="w-full p-2 border rounded-lg"></div>
+                <div><label class="block mb-1">聯絡電話</label><input type="text" id="edit-profile-phone" value="02-2700-8888 #101" class="w-full p-2 border rounded-lg"></div>
+                <div><label class="block mb-1">電子郵件</label><input type="text" id="edit-profile-email" value="alice.chen@company.com" class="w-full p-2 border rounded-lg"></div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('modal-profile-edit')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg">取消</button>
+                <button onclick="saveProfileEdit()" class="px-4 py-2 bg-[#5599FF] text-white text-xs font-bold rounded-lg">儲存個人名片</button>
+            </div>
+        </div>
+    </div>
 
-    function updateLeaderStatus() {
-      const now = new Date();
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    <!-- Modal: 檢視詳情通用 Modal -->
+    <div id="modal-detail-view" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[450px] shadow-2xl space-y-4 relative">
+            <button onclick="closeModal('modal-detail-view')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-lg font-black text-[#007799]" id="detail-view-title">詳細資訊</h3>
+            <div class="space-y-3 text-xs font-bold text-[#007799]" id="detail-view-content">
+                <!-- JS 動態填入 -->
+            </div>
+        </div>
+    </div>
 
-      let currentStatus = "在席 / 可洽公";
-      let statusColor = "#10b981"; // 綠色：空閒在席
+    <!-- Modal: 行程Modal -->
+    <div id="modal-schedule" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[480px] shadow-2xl space-y-3">
+            <h3 class="text-lg font-extrabold text-[#007799]">排定主管行程</h3>
+            <input type="hidden" id="sch-edit-index" value="-1">
+            <div class="space-y-3 text-xs font-bold text-[#007799]">
+                <div><label class="block mb-1">行程名稱</label><input type="text" id="sch-title" class="w-full p-2 border rounded-lg"></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block mb-1">日期</label><input type="date" id="sch-date" class="w-full p-2 border rounded-lg"></div>
+                    <div><label class="block mb-1">時間</label><input type="text" id="sch-time" class="w-full p-2 border rounded-lg" placeholder="10:00 - 11:30"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block mb-1">地點</label><input type="text" id="sch-loc" class="w-full p-2 border rounded-lg"></div>
+                    <div><label class="block mb-1">分類</label>
+                        <select id="sch-cate" class="w-full p-2 border rounded-lg">
+                            <option value="內部會議">內部會議</option>
+                            <option value="商務拜訪">商務拜訪</option>
+                            <option value="外賓接待">外賓接待</option>
+                        </select>
+                    </div>
+                </div>
+                <div><label class="block mb-1">備註</label><textarea id="sch-note" class="w-full p-2 border rounded-lg h-16"></textarea></div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('modal-schedule')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg">取消</button>
+                <button onclick="saveSchedule()" class="px-4 py-2 bg-[#5599FF] text-white text-xs font-bold rounded-lg">儲存</button>
+            </div>
+        </div>
+    </div>
 
-      for (const item of leaderSchedule) {
-        const [sHour, sMin] = item.start.split(':').map(Number);
-        const [eHour, eMin] = item.end.split(':').map(Number);
-        const startMinutes = sHour * 60 + sMin;
-        const endMinutes = eHour * 60 + eMin;
+    <!-- Modal: 簽核任務 Modal (包含下拉選單分類) -->
+    <div id="modal-task" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[480px] shadow-2xl space-y-3">
+            <h3 class="text-lg font-extrabold text-[#007799]">新增/編輯簽核任務</h3>
+            <input type="hidden" id="task-edit-index" value="-1">
+            <div class="space-y-3 text-xs font-bold text-[#007799]">
+                <div><label class="block mb-1">專案名稱</label><input type="text" id="task-name" class="w-full p-2 border rounded-lg"></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block mb-1">分類選項</label>
+                        <select id="task-cate" class="w-full p-2 border rounded-lg">
+                            <option value="行政公文">行政公文</option>
+                            <option value="財務採購">財務採購</option>
+                            <option value="人事異動">人事異動</option>
+                            <option value="法務合約">法務合約</option>
+                            <option value="專案決議">專案決議</option>
+                        </select>
+                    </div>
+                    <div><label class="block mb-1">呈送單位</label><input type="text" id="task-dept" class="w-full p-2 border rounded-lg"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block mb-1">負責人</label><input type="text" id="task-owner" class="w-full p-2 border rounded-lg"></div>
+                    <div><label class="block mb-1">截止日</label><input type="date" id="task-deadline" class="w-full p-2 border rounded-lg"></div>
+                </div>
+                <div><label class="block mb-1">簽核狀態</label>
+                    <select id="task-status" class="w-full p-2 border rounded-lg">
+                        <option value="待簽核">待簽核</option>
+                        <option value="已簽核">已簽核</option>
+                        <option value="退回修正">退回修正</option>
+                    </select>
+                </div>
+                <div><label class="block mb-1">備註說明</label><textarea id="task-note" class="w-full p-2 border rounded-lg h-16"></textarea></div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('modal-task')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg">取消</button>
+                <button onclick="saveTask()" class="px-4 py-2 bg-[#5599FF] text-white text-xs font-bold rounded-lg">儲存</button>
+            </div>
+        </div>
+    </div>
 
-        if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
-          currentStatus = item.status;
-          statusColor = item.color;
-          break;
+    <!-- Modal: 專案 Modal (下拉分類、多檔案上傳/刪除/編輯) -->
+    <div id="modal-project" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[520px] shadow-2xl space-y-3">
+            <h3 class="text-lg font-extrabold text-[#007799]">專案進度設定</h3>
+            <input type="hidden" id="proj-edit-index" value="-1">
+            <div class="space-y-3 text-xs font-bold text-[#007799]">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block mb-1">專案名稱</label><input type="text" id="proj-name" class="w-full p-2 border rounded-lg"></div>
+                    <div>
+                        <label class="block mb-1">專案分類</label>
+                        <select id="proj-cate" class="w-full p-2 border rounded-lg">
+                            <option value="行政籌備">行政籌備</option>
+                            <option value="ESG 永續">ESG 永續</option>
+                            <option value="資訊系統">資訊系統</option>
+                            <option value="研發創新">研發創新</option>
+                            <option value="跨國營運">跨國營運</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block mb-1">主辦單位</label><input type="text" id="proj-dept" class="w-full p-2 border rounded-lg"></div>
+                    <div><label class="block mb-1">時程範圍</label><input type="text" id="proj-timeline" class="w-full p-2 border rounded-lg" placeholder="2026/01 - 2026/12"></div>
+                </div>
+                <div><label class="block mb-1">完成進度 (%)</label><input type="number" id="proj-progress" class="w-full p-2 border rounded-lg" min="0" max="100"></div>
+                <div><label class="block mb-1">專案說明</label><textarea id="proj-content" class="w-full p-2 border rounded-lg h-16"></textarea></div>
+                
+                <!-- 上傳多個檔案與列表編輯 -->
+                <div>
+                    <label class="block mb-1">新增專案附件 (可選擇多檔案)</label>
+                    <input type="file" id="proj-files-input" multiple class="w-full p-2 rounded-lg bg-[#CCDDFF]/20">
+                    <div id="proj-files-list" class="mt-2 space-y-1 max-h-24 overflow-y-auto"></div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('modal-project')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg">取消</button>
+                <button onclick="saveProject()" class="px-4 py-2 bg-[#00AAAA] text-white text-xs font-bold rounded-lg">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: 名片 Modal (新增手機, Email, 助理電話) -->
+    <div id="modal-contact" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[500px] shadow-2xl space-y-3">
+            <h3 class="text-lg font-extrabold text-[#007799]">名片資料設定</h3>
+            <input type="hidden" id="contact-edit-index" value="-1">
+            <div class="space-y-3 text-xs font-bold text-[#007799]">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block mb-1">姓名</label><input type="text" id="cnt-name" class="w-full p-2 border rounded-lg"></div>
+                    <div>
+                        <label class="block mb-1">分類選項</label>
+                        <select id="cnt-cate" class="w-full p-2 border rounded-lg">
+                            <option value="半導體/科技">半導體/科技</option>
+                            <option value="金融/投資">金融/投資</option>
+                            <option value="建設/地產">建設/地產</option>
+                            <option value="餐飲/公關">餐飲/公關</option>
+                            <option value="政府/公會">政府/公會</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block mb-1">公司名稱</label><input type="text" id="cnt-company" class="w-full p-2 border rounded-lg"></div>
+                    <div><label class="block mb-1">職稱</label><input type="text" id="cnt-title" class="w-full p-2 border rounded-lg"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div><label class="block mb-1">手機號碼</label><input type="text" id="cnt-phone" class="w-full p-2 border rounded-lg"></div>
+                    <div><label class="block mb-1">Email</label><input type="text" id="cnt-email" class="w-full p-2 border rounded-lg"></div>
+                    <div><label class="block mb-1">助理電話</label><input type="text" id="cnt-assistant" class="w-full p-2 border rounded-lg"></div>
+                </div>
+                <div><label class="block mb-1">認識地點 / 場合</label><input type="text" id="cnt-place" class="w-full p-2 border rounded-lg"></div>
+                <div><label class="block mb-1">過敏/喜好備註</label><textarea id="cnt-preference" class="w-full p-2 border rounded-lg h-16"></textarea></div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('modal-contact')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg">取消</button>
+                <button onclick="saveContact()" class="px-4 py-2 bg-[#5599FF] text-white text-xs font-bold rounded-lg">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: 送禮 Modal -->
+    <div id="modal-gift" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 w-[480px] shadow-2xl space-y-3">
+            <h3 class="text-lg font-extrabold text-[#007799]">送禮紀錄設定</h3>
+            <input type="hidden" id="gift-edit-index" value="-1">
+            <div class="space-y-3 text-xs font-bold text-[#007799]">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block mb-1">節慶分類</label>
+                        <select id="gft-cate" class="w-full p-2 border rounded-lg">
+                            <option value="中秋節">中秋節</option>
+                            <option value="春節禮品">春節禮品</option>
+                            <option value="生日祝賀">生日祝賀</option>
+                            <option value="升遷關懷">升遷關懷</option>
+                        </select>
+                    </div>
+                    <div><label class="block mb-1">對象姓名</label><input type="text" id="gft-name" class="w-full p-2 border rounded-lg"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block mb-1">禮品內容</label><input type="text" id="gft-item" class="w-full p-2 border rounded-lg"></div>
+                    <div><label class="block mb-1">預估金額 ($)</label><input type="text" id="gft-amount" class="w-full p-2 border rounded-lg"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block mb-1">日期</label><input type="date" id="gft-date" class="w-full p-2 border rounded-lg"></div>
+                    <div><label class="block mb-1">是否送達</label>
+                        <select id="gft-status" class="w-full p-2 border rounded-lg">
+                            <option value="否">否 (準備中)</option>
+                            <option value="是">是 (已送達)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal('modal-gift')" class="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg">取消</button>
+                <button onclick="saveGift()" class="px-4 py-2 bg-[#9999FF] text-white text-xs font-bold rounded-lg">儲存</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JS 核心應用與邏輯控制 -->
+    <script>
+        // 1. 初始化全域資料
+        let profile = {
+            name: "Alice Chen",
+            title: "董事長秘書",
+            phone: "02-2700-8888 #101",
+            email: "alice.chen@company.com",
+            avatar: null
+        };
+
+        let schedules = [
+            { title: "內部高階主管週報", date: "2026-09-12", time: "09:00 - 10:00", loc: "301 會議室", cate: "內部會議", note: "檢討 Q3 績效與各部門 KPIs" },
+            { title: "A 公司合作計畫簡報", date: "2026-09-12", time: "10:00 - 11:30", loc: "第一簡報室", cate: "商務拜訪", note: "進行合作意向書審閱" },
+            { title: "聯發科張董拜訪", date: "2026-09-12", time: "14:00 - 15:30", loc: "貴賓室", cate: "外賓接待", note: "準備熱烏龍茶" }
+        ];
+
+        let tasks = [
+            { name: "2026 Q4 研發預算簽核案", cate: "財務採購", dept: "財務部", owner: "Mark", deadline: "2026-09-14", status: "待簽核", note: "需補上設備規格比較表" },
+            { name: "台北分公司辦公室續約", cate: "行政公文", dept: "總務部", owner: "Sarah", deadline: "2026-09-20", status: "已簽核", note: "租金微幅調漲 3%" }
+        ];
+
+        let projects = [
+            { 
+                name: "2026 全球經銷商大會", 
+                cate: "行政籌備", 
+                dept: "行銷部", 
+                timeline: "2026/07 - 2026/10", 
+                progress: 75, 
+                content: "飯店已簽約、主講人名單已確認。", 
+                files: [{ name: "經銷商大會企劃書.pdf", url: "#" }] 
+            },
+            { 
+                name: "企業 CSR 永續報告書", 
+                cate: "ESG 永續", 
+                dept: "永續委員會", 
+                timeline: "2026/08 - 2026/11", 
+                progress: 35, 
+                content: "溫室氣體盤查數據收集完畢。", 
+                files: [{ name: "CSR_報告初稿.pdf", url: "#" }] 
+            }
+        ];
+
+        let contacts = [
+            { name: "張國華", cate: "半導體/科技", company: "聯發科技", title: "董事長", phone: "0912-345-678", email: "kh.chang@mtk.com", assistant: "02-1234-5678", place: "2024 高峰會", preference: "嚴重甲殼類過敏、喜好高爾夫球" },
+            { name: "王美玲", cate: "建設/地產", company: "台積電", title: "總經理", phone: "0922-888-999", email: "mlwang@tsmc.com", assistant: "03-5678-9999", place: "總部簽約會", preference: "素食 (蛋奶素)、喜好古典音樂" }
+        ];
+
+        let gifts = [
+            { cate: "中秋節", name: "張國華 董事長", item: "手工高山茶葉禮盒", amount: "3,600", date: "2026-09-18", status: "是" },
+            { cate: "生日祝賀", name: "王美玲 總經理", item: "高級水果籃", amount: "2,500", date: "2026-09-25", status: "否" }
+        ];
+
+        let notes = [
+            { id: 1, title: "0912 董事會準備事項", content: "1. 確認會議室茶水\n2. 準備 10 份紙本簡報\n3. 安排張董停車位" },
+            { id: 2, title: "主管交辦隨手筆記", content: "下週二前需確認與聯發科的會議時間。" }
+        ];
+        let currentNoteId = 1;
+        let tempProjectFiles = [];
+
+        // 分類顏色色彩標註對應表
+        const categoryColors = {
+            '行政籌備': 'bg-blue-100 text-blue-800',
+            'ESG 永續': 'bg-emerald-100 text-emerald-800',
+            '資訊系統': 'bg-purple-100 text-purple-800',
+            '研發創新': 'bg-amber-100 text-amber-800',
+            '跨國營運': 'bg-rose-100 text-rose-800',
+            '行政公文': 'bg-blue-100 text-blue-800',
+            '財務採購': 'bg-amber-100 text-amber-800',
+            '人事異動': 'bg-teal-100 text-teal-800',
+            '法務合約': 'bg-rose-100 text-rose-800',
+            '專案決議': 'bg-purple-100 text-purple-800',
+            '半導體/科技': 'bg-blue-100 text-blue-800',
+            '金融/投資': 'bg-emerald-100 text-emerald-800',
+            '建設/地產': 'bg-orange-100 text-orange-800',
+            '餐飲/公關': 'bg-pink-100 text-pink-800',
+            '政府/公會': 'bg-indigo-100 text-indigo-800'
+        };
+
+        // 2. 切換 Tab
+        function switchTab(tabId) {
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-[#5599FF]', 'text-white', 'shadow');
+                btn.classList.add('text-[#007799]');
+            });
+
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-[#5599FF]', 'text-white', 'shadow');
+                activeBtn.classList.remove('text-[#007799]');
+            }
+
+            if(tabId === 'notepad') setTimeout(initCanvas, 100);
         }
-      }
 
-      const badge = document.getElementById('leaderStatusBadge');
-      if (badge) {
-        badge.innerText = currentStatus;
-        badge.style.backgroundColor = statusColor;
-      }
-    }
+        // 3. 行事曆模組 (上下結構)
+        function renderSchedules() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            for(let i=1; i<=30; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = `p-2 rounded-xl text-center text-xs font-bold ${i === 12 ? 'bg-[#5599FF] text-white shadow' : 'bg-[#CCDDFF]/30'}`;
+                dayDiv.innerText = i;
+                grid.appendChild(dayDiv);
+            }
 
-    // 每 30 秒自動更新一次主管動態
-    setInterval(updateLeaderStatus, 30000);
-    // 初始化執行一次
-    updateLeaderStatus();
-  </script>
+            const container = document.getElementById('schedule-list-container');
+            container.innerHTML = '';
+            schedules.forEach((s, idx) => {
+                const card = document.createElement('div');
+                card.className = "p-3.5 bg-[#CCDDFF]/20 rounded-xl flex items-center justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 bg-[#5599FF] text-white text-[10px] font-extrabold rounded">${s.time}</span>
+                            <span class="text-xs font-black text-[#007799]">${s.title}</span>
+                            <span class="text-[10px] bg-white text-[#007799] font-bold px-2 py-0.5 rounded shadow-sm">${s.cate}</span>
+                        </div>
+                        <p class="text-xs text-[#0088A8] mt-1"><i class="fa-solid fa-location-dot mr-1"></i>${s.loc} | 備註: ${s.note}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="editSchedule(${idx})" class="p-1 text-[#007799] hover:text-[#5599FF]"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteSchedule(${idx})" class="p-1 text-[#FF8888] hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            document.getElementById('kpi-today-count').innerText = `${schedules.length} 場會議`;
+        }
+
+        function openScheduleModal() {
+            document.getElementById('sch-edit-index').value = "-1";
+            document.getElementById('sch-title').value = "";
+            document.getElementById('sch-date').value = "2026-09-12";
+            document.getElementById('sch-time').value = "10:00 - 11:30";
+            document.getElementById('sch-loc').value = "";
+            document.getElementById('sch-note').value = "";
+            openModal('modal-schedule');
+        }
+
+        function editSchedule(idx) {
+            const s = schedules[idx];
+            document.getElementById('sch-edit-index').value = idx;
+            document.getElementById('sch-title').value = s.title;
+            document.getElementById('sch-date').value = s.date;
+            document.getElementById('sch-time').value = s.time;
+            document.getElementById('sch-loc').value = s.loc;
+            document.getElementById('sch-cate').value = s.cate;
+            document.getElementById('sch-note').value = s.note;
+            openModal('modal-schedule');
+        }
+
+        function saveSchedule() {
+            const idx = parseInt(document.getElementById('sch-edit-index').value);
+            const data = {
+                title: document.getElementById('sch-title').value,
+                date: document.getElementById('sch-date').value,
+                time: document.getElementById('sch-time').value,
+                loc: document.getElementById('sch-loc').value,
+                cate: document.getElementById('sch-cate').value,
+                note: document.getElementById('sch-note').value
+            };
+            if(!data.title) return alert('請填寫名稱');
+            if(idx === -1) schedules.push(data);
+            else schedules[idx] = data;
+            closeModal('modal-schedule');
+            renderSchedules();
+        }
+
+        function deleteSchedule(idx) {
+            if(confirm("確定刪除此行程？")) {
+                schedules.splice(idx, 1);
+                renderSchedules();
+            }
+        }
+
+        // 4. 簽核追蹤 (專案名稱直接點擊檢視，取消右方檢視)
+        function renderTasks() {
+            const tbody = document.getElementById('task-table-body');
+            tbody.innerHTML = '';
+            tasks.forEach((t, idx) => {
+                const tr = document.createElement('tr');
+                const statusColor = t.status === '已簽核' ? 'bg-emerald-100 text-emerald-800' : (t.status === '待簽核' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800');
+                const cateBadge = categoryColors[t.cate] || 'bg-slate-100 text-slate-800';
+
+                tr.innerHTML = `
+                    <td class="p-3 font-black text-[#007799] cursor-pointer hover:underline flex items-center gap-1" onclick="viewTaskDetail(${idx})">
+                        <i class="fa-solid fa-file-signature text-[#5599FF]"></i> ${t.name}
+                    </td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${cateBadge}">${t.cate}</span></td>
+                    <td class="p-3">${t.dept}</td>
+                    <td class="p-3">${t.owner}</td>
+                    <td class="p-3">${t.deadline}</td>
+                    <td class="p-3"><span class="px-2 py-1 rounded-full text-[10px] font-extrabold ${statusColor}">${t.status}</span></td>
+                    <td class="p-3">${t.note}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="editTask(${idx})" class="text-[#007799] mr-2"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteTask(${idx})" class="text-[#FF8888]"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('kpi-task-count').innerText = `${tasks.length} 件待辦`;
+        }
+
+        function viewTaskDetail(idx) {
+            const t = tasks[idx];
+            document.getElementById('detail-view-title').innerText = "簽核任務詳情";
+            document.getElementById('detail-view-content').innerHTML = `
+                <p><strong>專案名稱：</strong>${t.name}</p>
+                <p><strong>分類：</strong>${t.cate}</p>
+                <p><strong>呈送單位：</strong>${t.dept}</p>
+                <p><strong>負責人：</strong>${t.owner}</p>
+                <p><strong>截止日：</strong>${t.deadline}</p>
+                <p><strong>狀態：</strong>${t.status}</p>
+                <p><strong>備註：</strong>${t.note}</p>
+            `;
+            openModal('modal-detail-view');
+        }
+
+        function openTaskModal() {
+            document.getElementById('task-edit-index').value = "-1";
+            document.getElementById('task-name').value = "";
+            document.getElementById('task-dept').value = "";
+            document.getElementById('task-owner').value = "";
+            document.getElementById('task-deadline').value = "";
+            document.getElementById('task-note').value = "";
+            openModal('modal-task');
+        }
+
+        function editTask(idx) {
+            const t = tasks[idx];
+            document.getElementById('task-edit-index').value = idx;
+            document.getElementById('task-name').value = t.name;
+            document.getElementById('task-cate').value = t.cate;
+            document.getElementById('task-dept').value = t.dept;
+            document.getElementById('task-owner').value = t.owner;
+            document.getElementById('task-deadline').value = t.deadline;
+            document.getElementById('task-status').value = t.status;
+            document.getElementById('task-note').value = t.note;
+            openModal('modal-task');
+        }
+
+        function saveTask() {
+            const idx = parseInt(document.getElementById('task-edit-index').value);
+            const data = {
+                name: document.getElementById('task-name').value,
+                cate: document.getElementById('task-cate').value,
+                dept: document.getElementById('task-dept').value,
+                owner: document.getElementById('task-owner').value,
+                deadline: document.getElementById('task-deadline').value,
+                status: document.getElementById('task-status').value,
+                note: document.getElementById('task-note').value
+            };
+            if(!data.name) return alert('請輸入專案名稱');
+            if(idx === -1) tasks.push(data);
+            else tasks[idx] = data;
+            closeModal('modal-task');
+            renderTasks();
+        }
+
+        function deleteTask(idx) {
+            if(confirm("確定刪除此任務？")) {
+                tasks.splice(idx, 1);
+                renderTasks();
+            }
+        }
+
+        // 5. 專案進度 (多檔案上傳、刪除與下載)
+        function renderProjects() {
+            const container = document.getElementById('projects-container');
+            container.innerHTML = '';
+            projects.forEach((p, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-5 rounded-2xl shadow space-y-3";
+                const cateBadge = categoryColors[p.cate] || 'bg-slate-100 text-slate-800';
+
+                let fileListHTML = p.files.map(f => 
+                    `<a href="${f.url}" download="${f.name}" class="inline-flex items-center px-2.5 py-1 bg-[#00AAAA] text-white rounded text-[10px] font-bold hover:bg-[#0088A8] mr-1 mb-1">
+                        <i class="fa-solid fa-file-pdf mr-1"></i> ${f.name}
+                    </a>`
+                ).join('');
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="px-2.5 py-0.5 font-bold text-[10px] rounded ${cateBadge}">${p.cate}</span>
+                            <h3 class="text-lg font-black text-[#007799] mt-1 cursor-pointer hover:underline" onclick="viewProjectDetail(${idx})">${p.name}</h3>
+                            <p class="text-xs text-[#0088A8]">主辦: ${p.dept} | 時程: ${p.timeline}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editProject(${idx})" class="p-1 text-[#007799]"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteProject(${idx})" class="p-1 text-[#FF8888]"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <p class="text-xs font-bold text-[#007799] bg-[#CCDDFF]/20 p-2.5 rounded-lg">${p.content}</p>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-extrabold text-[#0088A8]">附件檔案 (點擊即可下載)：</p>
+                        <div>${fileListHTML || '<span class="text-xs text-slate-400 font-bold">無附件檔案</span>'}</div>
+                    </div>
+                    <div class="pt-2">
+                        <div class="flex justify-between text-[10px] font-bold mb-1"><span>完成度</span><span>${p.progress}%</span></div>
+                        <div class="w-full bg-[#CCDDFF]/40 h-2 rounded-full overflow-hidden">
+                            <div class="bg-[#00AAAA] h-full" style="width: ${p.progress}%"></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            document.getElementById('kpi-project-count').innerText = `${projects.length} 項專案`;
+        }
+
+        function viewProjectDetail(idx) {
+            const p = projects[idx];
+            document.getElementById('detail-view-title').innerText = "專案詳細資訊";
+            let filesHTML = p.files.map(f => `<a href="${f.url}" download="${f.name}" class="text-[#00AAAA] underline block mt-1"><i class="fa-solid fa-download mr-1"></i>${f.name}</a>`).join('');
+            document.getElementById('detail-view-content').innerHTML = `
+                <p><strong>專案名稱：</strong>${p.name}</p>
+                <p><strong>分類：</strong>${p.cate}</p>
+                <p><strong>主辦單位：</strong>${p.dept}</p>
+                <p><strong>時程範圍：</strong>${p.timeline}</p>
+                <p><strong>進度：</strong>${p.progress}%</p>
+                <p><strong>說明：</strong>${p.content}</p>
+                <div><strong>下載附件檔案：</strong>${filesHTML || '無檔案'}</div>
+            `;
+            openModal('modal-detail-view');
+        }
+
+        function openProjectModal() {
+            document.getElementById('proj-edit-index').value = "-1";
+            document.getElementById('proj-name').value = "";
+            document.getElementById('proj-dept').value = "";
+            document.getElementById('proj-timeline').value = "";
+            document.getElementById('proj-progress').value = "0";
+            document.getElementById('proj-content').value = "";
+            tempProjectFiles = [];
+            renderModalFileList();
+            openModal('modal-project');
+        }
+
+        function editProject(idx) {
+            const p = projects[idx];
+            document.getElementById('proj-edit-index').value = idx;
+            document.getElementById('proj-name').value = p.name;
+            document.getElementById('proj-cate').value = p.cate;
+            document.getElementById('proj-dept').value = p.dept;
+            document.getElementById('proj-timeline').value = p.timeline;
+            document.getElementById('proj-progress').value = p.progress;
+            document.getElementById('proj-content').value = p.content;
+            tempProjectFiles = [...p.files];
+            renderModalFileList();
+            openModal('modal-project');
+        }
+
+        document.getElementById('proj-files-input').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(f => {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    tempProjectFiles.push({ name: f.name, url: evt.target.result });
+                    renderModalFileList();
+                };
+                reader.readAsDataURL(f);
+            });
+        });
+
+        function renderModalFileList() {
+            const list = document.getElementById('proj-files-list');
+            list.innerHTML = '';
+            tempProjectFiles.forEach((f, i) => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between text-[11px] bg-slate-100 p-1.5 rounded";
+                item.innerHTML = `<span>${f.name}</span><button onclick="removeTempFile(${i})" class="text-red-500 font-bold ml-2">刪除</button>`;
+                list.appendChild(item);
+            });
+        }
+
+        function removeTempFile(i) {
+            tempProjectFiles.splice(i, 1);
+            renderModalFileList();
+        }
+
+        function saveProject() {
+            const idx = parseInt(document.getElementById('proj-edit-index').value);
+            const data = {
+                name: document.getElementById('proj-name').value,
+                cate: document.getElementById('proj-cate').value,
+                dept: document.getElementById('proj-dept').value,
+                timeline: document.getElementById('proj-timeline').value,
+                progress: document.getElementById('proj-progress').value,
+                content: document.getElementById('proj-content').value,
+                files: [...tempProjectFiles]
+            };
+            if(!data.name) return alert('請填寫專案名稱');
+            if(idx === -1) projects.push(data);
+            else projects[idx] = data;
+            closeModal('modal-project');
+            renderProjects();
+        }
+
+        function deleteProject(idx) {
+            if(confirm("確定刪除此專案？")) {
+                projects.splice(idx, 1);
+                renderProjects();
+            }
+        }
+
+        // 6. 名片資料 (含聯絡通訊方式)
+        function renderContacts() {
+            const query = document.getElementById('contactSearch').value.toLowerCase();
+            const container = document.getElementById('contacts-container');
+            container.innerHTML = '';
+
+            let filtered = contacts.filter(c => 
+                c.name.toLowerCase().includes(query) || 
+                c.company.toLowerCase().includes(query) || 
+                c.phone.includes(query) ||
+                c.email.toLowerCase().includes(query)
+            );
+
+            filtered.forEach((c, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-5 rounded-2xl shadow flex items-start gap-4";
+                const cateBadge = categoryColors[c.cate] || 'bg-slate-100 text-slate-800';
+
+                card.innerHTML = `
+                    <div class="w-12 h-12 rounded-full bg-[#5599FF] text-white flex items-center justify-center font-black text-lg shrink-0">
+                        ${c.name[0]}
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-black text-base text-[#007799]">${c.name} ${c.title}</h4>
+                                <p class="text-xs font-bold text-[#0088A8]">${c.company} | <span class="px-1.5 py-0.5 rounded text-[10px] ${cateBadge}">${c.cate}</span></p>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="editContact(${idx})" class="p-1 text-[#007799]"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteContact(${idx})" class="p-1 text-[#FF8888]"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-xs font-bold text-[#007799] bg-[#CCDDFF]/20 p-2.5 rounded-xl space-y-1">
+                            <p><i class="fa-solid fa-mobile-screen mr-1 text-[#5599FF]"></i>手機: ${c.phone || '未提供'}</p>
+                            <p><i class="fa-solid fa-envelope mr-1 text-[#5599FF]"></i>Email: ${c.email || '未提供'}</p>
+                            <p><i class="fa-solid fa-phone-office mr-1 text-[#5599FF]"></i>助理電話: ${c.assistant || '未提供'}</p>
+                            <p><i class="fa-solid fa-handshake mr-1 text-[#5599FF]"></i>場合: ${c.place}</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openContactModal() {
+            document.getElementById('contact-edit-index').value = "-1";
+            document.getElementById('cnt-name').value = "";
+            document.getElementById('cnt-company').value = "";
+            document.getElementById('cnt-title').value = "";
+            document.getElementById('cnt-phone').value = "";
+            document.getElementById('cnt-email').value = "";
+            document.getElementById('cnt-assistant').value = "";
+            document.getElementById('cnt-place').value = "";
+            document.getElementById('cnt-preference').value = "";
+            openModal('modal-contact');
+        }
+
+        function editContact(idx) {
+            const c = contacts[idx];
+            document.getElementById('contact-edit-index').value = idx;
+            document.getElementById('cnt-name').value = c.name;
+            document.getElementById('cnt-cate').value = c.cate;
+            document.getElementById('cnt-company').value = c.company;
+            document.getElementById('cnt-title').value = c.title;
+            document.getElementById('cnt-phone').value = c.phone || '';
+            document.getElementById('cnt-email').value = c.email || '';
+            document.getElementById('cnt-assistant').value = c.assistant || '';
+            document.getElementById('cnt-place').value = c.place;
+            document.getElementById('cnt-preference').value = c.preference;
+            openModal('modal-contact');
+        }
+
+        function saveContact() {
+            const idx = parseInt(document.getElementById('contact-edit-index').value);
+            const data = {
+                name: document.getElementById('cnt-name').value,
+                cate: document.getElementById('cnt-cate').value,
+                company: document.getElementById('cnt-company').value,
+                title: document.getElementById('cnt-title').value,
+                phone: document.getElementById('cnt-phone').value,
+                email: document.getElementById('cnt-email').value,
+                assistant: document.getElementById('cnt-assistant').value,
+                place: document.getElementById('cnt-place').value,
+                preference: document.getElementById('cnt-preference').value
+            };
+            if(!data.name) return alert('請填寫姓名');
+            if(idx === -1) contacts.push(data);
+            else contacts[idx] = data;
+            closeModal('modal-contact');
+            renderContacts();
+        }
+
+        function deleteContact(idx) {
+            if(confirm("確定刪除此名片？")) {
+                contacts.splice(idx, 1);
+                renderContacts();
+            }
+        }
+
+        // 7. 節慶送禮 (點擊直接檢視詳情)
+        function renderGifts() {
+            const tbody = document.getElementById('gift-table-body');
+            tbody.innerHTML = '';
+            gifts.forEach((g, idx) => {
+                const tr = document.createElement('tr');
+                const statusColor = g.status === '是' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+                tr.innerHTML = `
+                    <td class="p-3 font-black">${g.cate}</td>
+                    <td class="p-3 cursor-pointer hover:underline text-[#007799]" onclick="viewGiftDetail(${idx})"><i class="fa-solid fa-gift mr-1 text-[#9999FF]"></i>${g.name}</td>
+                    <td class="p-3">${g.item}</td>
+                    <td class="p-3">$${g.amount}</td>
+                    <td class="p-3">${g.date}</td>
+                    <td class="p-3"><span class="px-2 py-1 rounded-full text-[10px] font-extrabold ${statusColor}">${g.status === '是' ? '已送達' : '未送達'}</span></td>
+                    <td class="p-3 text-center">
+                        <button onclick="editGift(${idx})" class="text-[#007799] mr-2"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteGift(${idx})" class="text-[#FF8888]"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function viewGiftDetail(idx) {
+            const g = gifts[idx];
+            document.getElementById('detail-view-title').innerText = "送禮紀錄詳情";
+            document.getElementById('detail-view-content').innerHTML = `
+                <p><strong>節慶分類：</strong>${g.cate}</p>
+                <p><strong>對象姓名：</strong>${g.name}</p>
+                <p><strong>禮品內容：</strong>${g.item}</p>
+                <p><strong>預估金額：</strong>$${g.amount}</p>
+                <p><strong>預計/送達日期：</strong>${g.date}</p>
+                <p><strong>是否送達：</strong>${g.status === '是' ? '已送達' : '準備中'}</p>
+            `;
+            openModal('modal-detail-view');
+        }
+
+        function openGiftModal() {
+            document.getElementById('gift-edit-index').value = "-1";
+            document.getElementById('gft-name').value = "";
+            document.getElementById('gft-item').value = "";
+            document.getElementById('gft-amount').value = "";
+            document.getElementById('gft-date').value = "";
+            openModal('modal-gift');
+        }
+
+        function editGift(idx) {
+            const g = gifts[idx];
+            document.getElementById('gift-edit-index').value = idx;
+            document.getElementById('gft-cate').value = g.cate;
+            document.getElementById('gft-name').value = g.name;
+            document.getElementById('gft-item').value = g.item;
+            document.getElementById('gft-amount').value = g.amount;
+            document.getElementById('gft-date').value = g.date;
+            document.getElementById('gft-status').value = g.status;
+            openModal('modal-gift');
+        }
+
+        function saveGift() {
+            const idx = parseInt(document.getElementById('gift-edit-index').value);
+            const data = {
+                cate: document.getElementById('gft-cate').value,
+                name: document.getElementById('gft-name').value,
+                item: document.getElementById('gft-item').value,
+                amount: document.getElementById('gft-amount').value,
+                date: document.getElementById('gft-date').value,
+                status: document.getElementById('gft-status').value
+            };
+            if(!data.name) return alert('請填寫對象姓名');
+            if(idx === -1) gifts.push(data);
+            else gifts[idx] = data;
+            closeModal('modal-gift');
+            renderGifts();
+        }
+
+        function deleteGift(idx) {
+            if(confirm("確定刪除此紀錄？")) {
+                gifts.splice(idx, 1);
+                renderGifts();
+            }
+        }
+
+        // 8. 記事本管理 (改名/刪除)
+        function renderNotes() {
+            const container = document.getElementById('notes-list');
+            container.innerHTML = '';
+            notes.forEach(n => {
+                const item = document.createElement('div');
+                item.className = `p-2.5 rounded-xl border flex items-center justify-between cursor-pointer text-xs font-bold ${n.id === currentNoteId ? 'bg-[#5599FF] text-white border-[#5599FF]' : 'bg-[#CCDDFF]/20 text-[#007799] border-transparent'}`;
+                item.innerHTML = `
+                    <span onclick="selectNote(${n.id})" class="truncate flex-1">${n.title}</span>
+                    <div class="flex items-center gap-1">
+                        <button onclick="renameNote(${n.id})" class="p-1"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteNote(${n.id})" class="p-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            const current = notes.find(n => n.id === currentNoteId);
+            if(current) {
+                document.getElementById('current-note-title').innerHTML = `<i class="fa-solid fa-align-left text-[#5599FF] mr-2"></i>${current.title}`;
+                document.getElementById('notepad-text').value = current.content;
+            } else {
+                document.getElementById('notepad-text').value = "";
+            }
+        }
+
+        function selectNote(id) {
+            currentNoteId = id;
+            renderNotes();
+        }
+
+        function addNewNote() {
+            const title = prompt("請輸入新筆記標題：", "未命名筆記");
+            if(title) {
+                const newNote = { id: Date.now(), title: title, content: "" };
+                notes.push(newNote);
+                currentNoteId = newNote.id;
+                renderNotes();
+            }
+        }
+
+        function renameNote(id) {
+            const note = notes.find(n => n.id === id);
+            if(!note) return;
+            const newTitle = prompt("請更改筆記標題：", note.title);
+            if(newTitle) {
+                note.title = newTitle;
+                renderNotes();
+            }
+        }
+
+        function deleteNote(id) {
+            if(confirm("確定刪除此筆記？")) {
+                notes = notes.filter(n => n.id !== id);
+                if(notes.length > 0) currentNoteId = notes[0].id;
+                else currentNoteId = null;
+                renderNotes();
+            }
+        }
+
+        function saveCurrentNoteContent() {
+            const current = notes.find(n => n.id === currentNoteId);
+            if(current) {
+                current.content = document.getElementById('notepad-text').value;
+            }
+        }
+
+        // 9. 特助個人名片控制 (頭像上傳固定與檢視)
+        function viewProfileModal() {
+            document.getElementById('view-profile-name').innerText = profile.name;
+            document.getElementById('view-profile-title').innerText = profile.title;
+            document.getElementById('view-profile-phone').innerText = profile.phone;
+            document.getElementById('view-profile-email').innerText = profile.email;
+            
+            const img = document.getElementById('view-profile-img');
+            const placeholder = document.getElementById('view-profile-placeholder');
+            if(profile.avatar) {
+                img.src = profile.avatar;
+                img.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                img.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
+            openModal('modal-profile-view');
+        }
+
+        function openProfileEditModal() {
+            document.getElementById('edit-profile-name').value = profile.name;
+            document.getElementById('edit-profile-title').value = profile.title;
+            document.getElementById('edit-profile-phone').value = profile.phone;
+            document.getElementById('edit-profile-email').value = profile.email;
+            openModal('modal-profile-edit');
+        }
+
+        function saveProfileEdit() {
+            profile.name = document.getElementById('edit-profile-name').value;
+            profile.title = document.getElementById('edit-profile-title').value;
+            profile.phone = document.getElementById('edit-profile-phone').value;
+            profile.email = document.getElementById('edit-profile-email').value;
+
+            document.getElementById('profile-display-name').innerText = profile.name;
+            document.getElementById('profile-display-title').innerText = profile.title;
+
+            const avatarInput = document.getElementById('profile-avatar-input');
+            if(avatarInput.files && avatarInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profile.avatar = e.target.result;
+                    const img = document.getElementById('avatar-preview');
+                    img.src = profile.avatar;
+                    img.classList.remove('hidden');
+                    document.getElementById('avatar-placeholder').classList.add('hidden');
+                };
+                reader.readAsDataURL(avatarInput.files[0]);
+            }
+
+            closeModal('modal-profile-edit');
+        }
+
+        // 10. 繪圖板邏輯 (精確計算相對滑鼠座標修正偏離問題)
+        let isDrawing = false;
+        let canvas, ctx;
+
+        function initCanvas() {
+            canvas = document.getElementById('drawingCanvas');
+            const wrapper = document.getElementById('canvas-wrapper');
+            canvas.width = wrapper.clientWidth;
+            canvas.height = wrapper.clientHeight;
+            ctx = canvas.getContext('2d');
+
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
+            }
+
+            function startDraw(e) {
+                isDrawing = true;
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+            }
+
+            function draw(e) {
+                if (!isDrawing) return;
+                const pos = getPos(e);
+                ctx.strokeStyle = document.getElementById('brushColor').value;
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+            }
+
+            function stopDraw() { isDrawing = false; }
+
+            canvas.onmousedown = startDraw;
+            canvas.onmousemove = draw;
+            canvas.onmouseup = stopDraw;
+            canvas.onmouseleave = stopDraw;
+
+            canvas.ontouchstart = startDraw;
+            canvas.ontouchmove = draw;
+            canvas.ontouchend = stopDraw;
+        }
+
+        function clearCanvas() {
+            if(ctx && canvas) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        // 通用 Modal 控制
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
+
+        // 頁面加載初始化
+        window.onload = function() {
+            renderSchedules();
+            renderTasks();
+            renderProjects();
+            renderContacts();
+            renderGifts();
+            renderNotes();
+        };
+    </script>
 </body>
 </html>
