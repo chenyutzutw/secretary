@@ -118,10 +118,10 @@
           </div>
         </div>
         <div class="overflow-hidden">
-          <button onclick="openPersonalCardModal()" class="font-bold text-sm text-gray-800 hover:text-blue-600 transition truncate block text-left">
+          <button id="myProfileName" onclick="openPersonalCardModal()" class="font-bold text-sm text-gray-800 hover:text-blue-600 transition truncate block text-left">
             ALICE CHEN
           </button>
-          <div class="text-[11px] font-semibold text-gray-500 truncate">董事長秘書</div>
+          <div id="myProfileTitle" class="text-[11px] font-semibold text-gray-500 truncate">董事長秘書</div>
         </div>
       </div>
     </aside>
@@ -258,7 +258,7 @@
             </div>
           </div>
 
-          <!-- 下：詳細行事曆（移除卷軸，完整顯示） -->
+          <!-- 下：詳細行事曆 -->
           <div class="bg-white/75 backdrop-blur-md rounded-2xl p-5 shadow-sm border border-white flex flex-col">
             <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
               <div>
@@ -369,7 +369,7 @@
                 <span>表格</span>
               </button>
               <button onclick="saveTextNote()" class="ml-4 px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-blue-700 transition">
-                儲存記事
+                歸檔記事
               </button>
             </div>
           </div>
@@ -435,6 +435,12 @@
     const todayDateStr = "2026-09-16";       // 今日日期標記
     let selectedDateStr = "2026-09-16";      // 選取的日期紀錄
 
+    // 常數 LocalStorage Key
+    const DB_STORAGE_KEY = 'zhufeng_ea_db_v1';
+    const PROFILE_STORAGE_KEY = 'zhufeng_ea_profile_v1';
+    const EDITOR_STORAGE_KEY = 'zhufeng_ea_editor_v1';
+    const CANVAS_STORAGE_KEY = 'zhufeng_ea_canvas_v1';
+
     // 個人資訊
     let myProfile = {
       name: "ALICE CHEN",
@@ -444,8 +450,8 @@
       avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150"
     };
 
-    // 全域資料庫
-    const db = {
+    // 全域預設資料庫
+    let db = {
       contacts: [
         { id: 1, name: "林建宏", title: "總經理", company: "國泰世華銀行 企業金融部", phone: "0912-345-678", email: "lin.jh@cathay.com", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150", lastMet: "2026-09-10", location: "國泰世華總部", note: "VIP合作夥伴，喜好烏龍茶" },
         { id: 2, name: "林雅婷", title: "首席建築師", company: "竹風設計事務所", phone: "0922-111-222", email: "yating@zhufeng-design.com", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150", lastMet: "2026-09-05", location: "台北設計展", note: "竹東案場主設計師" },
@@ -528,7 +534,47 @@
       }
     };
 
+    // --- 自動儲存與載入核心 ---
+    function saveData() {
+      try {
+        localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(db));
+        localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(myProfile));
+        const editor = document.getElementById('editor');
+        if (editor) {
+          localStorage.setItem(EDITOR_STORAGE_KEY, editor.innerHTML);
+        }
+        if (canvas) {
+          localStorage.setItem(CANVAS_STORAGE_KEY, canvas.toDataURL());
+        }
+      } catch (e) {
+        console.error('儲存失敗:', e);
+      }
+    }
+
+    function loadData() {
+      const savedDb = localStorage.getItem(DB_STORAGE_KEY);
+      if (savedDb) {
+        try {
+          db = JSON.parse(savedDb);
+        } catch (e) {
+          console.error('解析資料庫失敗:', e);
+        }
+      }
+
+      const savedProfile = localStorage.getItem(PROFILE_STORAGE_KEY);
+      if (savedProfile) {
+        try {
+          myProfile = JSON.parse(savedProfile);
+        } catch (e) {
+          console.error('解析個人資料失敗:', e);
+        }
+      }
+    }
+
     window.onload = function() {
+      loadData();
+      renderProfileUI();
+
       lucide.createIcons();
       updateClock();
       setInterval(updateClock, 1000);
@@ -538,8 +584,29 @@
       renderContacts();
       renderGifts();
       renderNoteHistory();
+      
+      const savedEditor = localStorage.getItem(EDITOR_STORAGE_KEY);
+      if (savedEditor !== null) {
+        const editor = document.getElementById('editor');
+        if (editor) editor.innerHTML = savedEditor;
+      }
+
+      const editorEl = document.getElementById('editor');
+      if (editorEl) {
+        editorEl.addEventListener('input', saveData);
+      }
+
       initCanvas();
     };
+
+    function renderProfileUI() {
+      const avatarImg = document.getElementById('myAvatarImg');
+      const nameBtn = document.getElementById('myProfileName');
+      const titleDiv = document.getElementById('myProfileTitle');
+      if (avatarImg) avatarImg.src = myProfile.avatar;
+      if (nameBtn) nameBtn.innerText = myProfile.name;
+      if (titleDiv) titleDiv.innerText = myProfile.title;
+    }
 
     function updateClock() {
       const now = new Date();
@@ -673,7 +740,6 @@
       container.innerHTML = list.map((item, idx) => `
         <div class="p-4 bg-white rounded-xl border border-gray-100 hover:border-blue-200 shadow-sm transition space-y-2">
           
-          <!-- 時間標籤 (明顯標在事件上方) -->
           <div class="flex items-center justify-between pb-1 border-b border-gray-100">
             <div class="flex items-center space-x-2">
               <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm flex items-center space-x-1">
@@ -683,7 +749,6 @@
               <span class="px-2 py-0.5 text-[11px] bg-blue-100 text-blue-700 font-bold rounded">${item.type}</span>
             </div>
             
-            <!-- 操作按鈕 (編輯 & 刪除) -->
             <div class="flex items-center space-x-2">
               <button onclick="openEditScheduleModal('${dateStr}', ${idx})" class="px-2.5 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold transition flex items-center space-x-1">
                 <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
@@ -696,7 +761,6 @@
             </div>
           </div>
 
-          <!-- 事件主體內容 -->
           <div onclick="openScheduleModal('${dateStr}', ${idx})" class="cursor-pointer space-y-1 pt-1">
             <div class="text-base font-bold text-gray-800 hover:text-blue-600 transition">${item.title}</div>
             <div class="text-xs text-gray-500 flex items-center space-x-1">
@@ -763,6 +827,7 @@
       }
 
       db.schedules[selectedDateStr].push({ type, time, title, loc, detail });
+      saveData();
       renderCalendar();
       closeModal();
     }
@@ -793,6 +858,7 @@
         item.loc = document.getElementById('eschLoc').value;
         item.detail = document.getElementById('eschDetail').value;
 
+        saveData();
         renderCalendar();
         closeModal();
       }
@@ -804,6 +870,7 @@
         if (db.schedules[dateStr].length === 0) {
           delete db.schedules[dateStr];
         }
+        saveData();
         renderCalendar();
       }
     }
@@ -951,6 +1018,7 @@
             date: todayStr
           });
         }
+        saveData();
         renderProjects();
         alert(`已成功上傳 ${files.length} 個檔案至「${db.projects[0].name}」！`);
       }
@@ -1033,6 +1101,7 @@
           location,
           note: "新建立聯絡人" 
         });
+        saveData();
         renderContacts();
         closeModal();
       }
@@ -1142,6 +1211,7 @@
         note
       });
 
+      saveData();
       renderGifts();
       closeModal();
     }
@@ -1185,6 +1255,7 @@
         g.date = document.getElementById('egDate').value;
         g.status = document.getElementById('egStatus').value;
         g.note = document.getElementById('egNote').value;
+        saveData();
         renderGifts();
         closeModal();
       }
@@ -1193,6 +1264,7 @@
     function deleteGift(id) {
       if(confirm('確定要刪除這筆送禮紀錄嗎？')) {
         db.gifts = db.gifts.filter(g => g.id !== id);
+        saveData();
         renderGifts();
         closeModal();
       }
@@ -1201,6 +1273,7 @@
     // --- 記事本 ---
     function formatDoc(cmd, value = null) {
       document.execCommand(cmd, false, value);
+      saveData();
     }
 
     function insertTable() {
@@ -1209,6 +1282,7 @@
         <tr><td class="border border-gray-300 p-1">1</td><td class="border border-gray-300 p-1">範例資料</td></tr>
       </table>`;
       document.execCommand('insertHTML', false, html);
+      saveData();
     }
 
     function saveTextNote() {
@@ -1221,8 +1295,10 @@
         content: content
       };
       db.notesHistory.unshift(newNote);
+      saveData();
       renderNoteHistory();
       document.getElementById('editor').innerHTML = '';
+      saveData();
       alert('已成功歸檔儲存！');
     }
 
@@ -1263,12 +1339,14 @@
       const note = db.notesHistory.find(n => n.id === id);
       if(note) {
         document.getElementById('editor').innerHTML = note.content;
+        saveData();
       }
     }
 
     function deleteNoteHistory(id) {
       if(confirm('確定要刪除這筆歷史紀錄嗎？')) {
         db.notesHistory = db.notesHistory.filter(n => n.id !== id);
+        saveData();
         renderNoteHistory();
       }
     }
@@ -1286,6 +1364,16 @@
       if (rect.width > 0 && canvas.width !== rect.width) {
         canvas.width = rect.width;
         canvas.height = 320;
+      }
+
+      // 復原先前的手繪圖
+      const savedCanvas = localStorage.getItem(CANVAS_STORAGE_KEY);
+      if (savedCanvas) {
+        const img = new Image();
+        img.onload = function() {
+          ctx.drawImage(img, 0, 0);
+        };
+        img.src = savedCanvas;
       }
 
       const colorInput = document.getElementById('drawingColor');
@@ -1331,6 +1419,7 @@
         if (isDrawing) {
           isDrawing = false;
           ctx.beginPath();
+          saveData();
         }
       }
 
@@ -1347,6 +1436,7 @@
     function clearCanvas() {
       if (ctx && canvas) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        saveData();
       }
     }
 
@@ -1373,7 +1463,8 @@
         const reader = new FileReader();
         reader.onload = function(evt) {
           myProfile.avatar = evt.target.result;
-          document.getElementById('myAvatarImg').src = evt.target.result;
+          renderProfileUI();
+          saveData();
         };
         reader.readAsDataURL(file);
       }
@@ -1420,9 +1511,8 @@
       myProfile.phone = document.getElementById('pPhone').value;
       myProfile.email = document.getElementById('pEmail').value;
 
-      document.querySelector('.overflow-hidden button').innerText = myProfile.name;
-      document.querySelector('.overflow-hidden .text-\\[11px\\]').innerText = myProfile.title;
-
+      renderProfileUI();
+      saveData();
       closeModal();
     }
 
@@ -1464,6 +1554,7 @@
       const item = db.approvals.find(a => a.id === id);
       if (item) {
         item.status = newStatus;
+        saveData();
         renderApprovals();
       }
     }
@@ -1516,6 +1607,7 @@
         content: content || "無詳細內容"
       });
 
+      saveData();
       renderApprovals();
       closeModal();
     }
@@ -1542,6 +1634,7 @@
         item.title = document.getElementById('editAppTitle').value;
         item.applicant = document.getElementById('editAppApplicant').value;
         item.content = document.getElementById('editAppContent').value;
+        saveData();
         renderApprovals();
         closeModal();
       }
@@ -1550,6 +1643,7 @@
     function deleteApproval(id) {
       if (confirm('確定要刪除這筆簽核文件嗎？')) {
         db.approvals = db.approvals.filter(a => a.id !== id);
+        saveData();
         renderApprovals();
       }
     }
