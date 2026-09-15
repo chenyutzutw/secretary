@@ -304,7 +304,7 @@
         </div>
       </section>
 
-      <!-- TAB 4: 專案管理 Projects (增強點擊與檔案下載) -->
+      <!-- TAB 4: 專案管理 Projects -->
       <section id="tab-projects" class="hidden space-y-4">
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-bold text-gray-800">進行中專案與檔案</h2>
@@ -319,7 +319,7 @@
         </div>
       </section>
 
-      <!-- TAB 5: 名片資料庫 Contacts (包含上次見面時間與認識地點) -->
+      <!-- TAB 5: 名片資料庫 Contacts -->
       <section id="tab-contacts" class="hidden space-y-4">
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-bold text-gray-800">名片通訊錄</h2>
@@ -333,9 +333,15 @@
         </div>
       </section>
 
-      <!-- TAB 6: 送禮規劃 Gift Plan (包含金額) -->
+      <!-- TAB 6: 送禮規劃 Gift Plan (新增右上角按鈕與完整編輯功能) -->
       <section id="tab-gifts" class="hidden space-y-4">
-        <h2 class="text-xl font-bold text-gray-800">送禮與公關紀錄</h2>
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-bold text-gray-800">送禮與公關紀錄</h2>
+          <button onclick="openNewGiftModal()" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold shadow hover:bg-blue-700 transition flex items-center space-x-1">
+            <i data-lucide="gift" class="w-4 h-4"></i>
+            <span>+ 新增送禮</span>
+          </button>
+        </div>
         <div class="grid grid-cols-2 gap-6" id="giftGrid">
         </div>
       </section>
@@ -408,7 +414,7 @@
     const db = {
       contacts: [
         { id: 1, name: "林建宏", title: "總經理", company: "國泰世華銀行 企業金融部", phone: "0912-345-678", email: "lin.jh@cathay.com", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150", lastMet: "2026-09-10", location: "國泰世華總部", note: "VIP合作夥伴，喜好烏龍茶" },
-        { id: 2, name: "林雅婷", title: "首席建築師", company: "竹風設計事務所", phone: "0922-111-222", email: "yating@zhufeng-design.com", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150", lastMet: "2026-09-05", location: "台北國際設計展", note: "竹東案場主設計師" },
+        { id: 2, name: "林雅婷", title: "首席建築師", company: "竹風設計事務所", phone: "0922-111-222", email: "yating@zhufeng-design.com", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150", lastMet: "2026-09-05", location: "竹北設計會議室", note: "竹東案場主設計師" },
         { id: 3, name: "張偉德", title: "營造部技師", company: "宏達營造", phone: "0933-888-999", email: "wd.chang@hd.com", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150", lastMet: "2026-08-28", location: "竹東工地現場", note: "負責鋼筋結構檢驗" }
       ],
       projects: [
@@ -450,7 +456,7 @@
         }
       ],
       gifts: [
-        { id: 1, title: "中秋高檔茶葉禮盒", recipient: "林建宏 總經理", amount: 6800, date: "2026-09-15", status: "已送出", note: "對方回禮：精裝紅酒乙瓶" },
+        { id: 1, title: "中秋高檔茶葉禮盒", recipient: "林建宏 總經理", amount: 6800, date: "2026-09-15", status: "已送達", note: "對方回禮：精裝紅酒乙瓶" },
         { id: 2, title: "國慶精緻手工點心", recipient: "陳縣長 辦公室", amount: 3500, date: "2026-10-05", status: "準備中", note: "確認秘書收件時間" }
       ],
       approvals: [
@@ -644,7 +650,7 @@
       `);
     }
 
-    // --- 專案管理 (新增點擊彈窗與檔案下載/檢視功能) ---
+    // --- 專案管理 ---
     function renderProjects() {
       const grid = document.getElementById('projectGrid');
       grid.innerHTML = db.projects.map(p => `
@@ -683,7 +689,6 @@
             </div>
           </div>
 
-          <!-- 進度條 -->
           <div>
             <div class="flex justify-between text-xs font-bold text-gray-600 mb-1">
               <span>整體執行進度</span>
@@ -694,7 +699,6 @@
             </div>
           </div>
 
-          <!-- 專案簡介 -->
           <div class="space-y-1">
             <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider">專案說明</h4>
             <div class="p-3.5 bg-gray-50 rounded-xl border border-gray-200/80 text-sm text-gray-700 leading-relaxed">
@@ -702,7 +706,6 @@
             </div>
           </div>
 
-          <!-- 相關檔案清單與下載連結 -->
           <div class="space-y-2">
             <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center justify-between">
               <span>專案附檔清單 (${p.files.length})</span>
@@ -782,7 +785,6 @@
           else if(ext === 'doc' || ext === 'docx') type = 'word';
           else if(ext === 'xls' || ext === 'xlsx') type = 'excel';
 
-          // 預設加入第一筆進行中專案
           db.projects[0].files.push({
             id: Date.now(),
             name: f.name,
@@ -878,19 +880,19 @@
       }
     }
 
-    // --- 送禮規劃 ---
+    // --- 送禮規劃 (新增狀態控制與編輯功能) ---
     function renderGifts() {
       const grid = document.getElementById('giftGrid');
       grid.innerHTML = db.gifts.map(g => `
         <div onclick="openGiftModal(${g.id})" class="p-5 bg-white/80 rounded-2xl border border-white shadow-sm hover:shadow-md cursor-pointer transition space-y-3">
           <div class="flex justify-between items-center">
-            <span class="px-2.5 py-1 bg-purple-100 text-purple-700 font-bold text-xs rounded-lg">${g.status}</span>
+            <span class="px-2.5 py-1 text-xs font-bold rounded-lg ${getGiftStatusBadge(g.status)}">${g.status}</span>
             <span class="text-xs font-mono text-gray-400">${g.date}</span>
           </div>
           <h4 class="font-bold text-gray-800 text-lg">${g.title}</h4>
           <div class="flex justify-between items-center text-xs text-gray-600">
             <span>送禮對象：<strong>${g.recipient}</strong></span>
-            <span class="font-bold text-emerald-600">金額：NT$ ${g.amount.toLocaleString()}</span>
+            <span class="font-bold text-emerald-600">金額：NT$ ${Number(g.amount).toLocaleString()}</span>
           </div>
           <div class="p-2.5 bg-gray-50 rounded-xl text-xs text-gray-500 border border-gray-100">
             <strong>備註：</strong>${g.note}
@@ -899,22 +901,143 @@
       `).join('');
     }
 
+    function getGiftStatusBadge(status) {
+      switch(status) {
+        case '已送達': return 'bg-emerald-100 text-emerald-700';
+        case '已送出': return 'bg-purple-100 text-purple-700';
+        case '準備中': return 'bg-amber-100 text-amber-700';
+        case '取消': return 'bg-gray-100 text-gray-600';
+        default: return 'bg-purple-100 text-purple-700';
+      }
+    }
+
     function openGiftModal(id) {
       const g = db.gifts.find(item => item.id === id);
+      if (!g) return;
       showModal(`
         <div class="space-y-4">
-          <div class="flex justify-between items-center border-b pb-3">
-            <span class="px-3 py-1 bg-purple-100 text-purple-700 font-bold text-xs rounded-lg">${g.status}</span>
-            <span class="text-xs font-mono text-gray-500">日期：${g.date}</span>
+          <div class="flex justify-between items-center border-b pb-3 pr-8">
+            <span class="px-3 py-1 text-xs font-bold rounded-lg ${getGiftStatusBadge(g.status)}">${g.status}</span>
+            <div class="flex items-center space-x-3">
+              <span class="text-xs font-mono text-gray-500">日期：${g.date}</span>
+              <button onclick="openEditGiftModal(${g.id})" class="px-3 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                <span>編輯</span>
+              </button>
+            </div>
           </div>
           <h3 class="text-xl font-bold text-gray-800">${g.title}</h3>
           <div class="text-sm"><strong>收禮對象：</strong>${g.recipient}</div>
-          <div class="text-sm font-bold text-emerald-600">金額：NT$ ${g.amount.toLocaleString()}</div>
+          <div class="text-sm font-bold text-emerald-600">金額：NT$ ${Number(g.amount).toLocaleString()}</div>
           <div class="p-3 bg-gray-50 rounded-xl border text-xs text-gray-600">
             <strong>備註紀錄：</strong>${g.note}
           </div>
         </div>
       `);
+    }
+
+    function openNewGiftModal() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      showModal(`
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold text-gray-800">新增送禮紀錄</h3>
+          <div class="space-y-3 text-xs">
+            <div><label class="block mb-1 font-bold">送禮項目 / 名目</label><input type="text" id="gTitle" placeholder="例如：中秋高檔茶葉禮盒" class="w-full p-2 border rounded-lg"></div>
+            <div><label class="block mb-1 font-bold">收禮對象</label><input type="text" id="gRecipient" placeholder="例如：林建宏 總經理" class="w-full p-2 border rounded-lg"></div>
+            <div><label class="block mb-1 font-bold">金額 (NT$)</label><input type="number" id="gAmount" placeholder="6800" class="w-full p-2 border rounded-lg"></div>
+            <div><label class="block mb-1 font-bold">預定送禮日期</label><input type="date" id="gDate" value="${todayStr}" class="w-full p-2 border rounded-lg"></div>
+            <div><label class="block mb-1 font-bold">送禮狀態</label>
+              <select id="gStatus" class="w-full p-2 border rounded-lg bg-white">
+                <option value="準備中">準備中</option>
+                <option value="已送出">已送出</option>
+                <option value="已送達">已送達</option>
+                <option value="取消">取消</option>
+              </select>
+            </div>
+            <div><label class="block mb-1 font-bold">備註說明</label><textarea id="gNote" rows="3" placeholder="備註交期或回禮情況..." class="w-full p-2 border rounded-lg"></textarea></div>
+          </div>
+          <button onclick="saveNewGift()" class="w-full py-2 bg-blue-600 text-white font-bold rounded-xl text-xs shadow hover:bg-blue-700">儲存紀錄</button>
+        </div>
+      `);
+    }
+
+    function saveNewGift() {
+      const title = document.getElementById('gTitle').value;
+      const recipient = document.getElementById('gRecipient').value;
+      const amount = document.getElementById('gAmount').value || 0;
+      const date = document.getElementById('gDate').value;
+      const status = document.getElementById('gStatus').value;
+      const note = document.getElementById('gNote').value || "無備註";
+
+      if (!title || !recipient) {
+        alert('請填寫禮品名目與收禮對象！');
+        return;
+      }
+
+      db.gifts.unshift({
+        id: Date.now(),
+        title,
+        recipient,
+        amount: Number(amount),
+        date,
+        status,
+        note
+      });
+
+      renderGifts();
+      closeModal();
+    }
+
+    function openEditGiftModal(id) {
+      const g = db.gifts.find(item => item.id === id);
+      if (!g) return;
+
+      showModal(`
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold text-gray-800">編輯送禮紀錄</h3>
+          <div class="space-y-3 text-xs">
+            <div><label class="block mb-1 font-bold">送禮項目 / 名目</label><input type="text" id="egTitle" value="${g.title}" class="w-full p-2 border rounded-lg"></div>
+            <div><label class="block mb-1 font-bold">收禮對象</label><input type="text" id="egRecipient" value="${g.recipient}" class="w-full p-2 border rounded-lg"></div>
+            <div><label class="block mb-1 font-bold">金額 (NT$)</label><input type="number" id="egAmount" value="${g.amount}" class="w-full p-2 border rounded-lg"></div>
+            <div><label class="block mb-1 font-bold">送禮日期</label><input type="date" id="egDate" value="${g.date}" class="w-full p-2 border rounded-lg"></div>
+            <div><label class="block mb-1 font-bold">送禮狀態</label>
+              <select id="egStatus" class="w-full p-2 border rounded-lg bg-white">
+                <option value="準備中" ${g.status === '準備中' ? 'selected' : ''}>準備中</option>
+                <option value="已送出" ${g.status === '已送出' ? 'selected' : ''}>已送出</option>
+                <option value="已送達" ${g.status === '已送達' ? 'selected' : ''}>已送達</option>
+                <option value="取消" ${g.status === '取消' ? 'selected' : ''}>取消</option>
+              </select>
+            </div>
+            <div><label class="block mb-1 font-bold">備註說明</label><textarea id="egNote" rows="3" class="w-full p-2 border rounded-lg">${g.note}</textarea></div>
+          </div>
+          <div class="flex space-x-2 pt-2">
+            <button onclick="saveEditGift(${g.id})" class="flex-1 py-2 bg-blue-600 text-white font-bold rounded-xl text-xs shadow hover:bg-blue-700">更新儲存</button>
+            <button onclick="deleteGift(${g.id})" class="px-4 py-2 bg-red-50 text-red-600 font-bold rounded-xl text-xs hover:bg-red-100">刪除</button>
+          </div>
+        </div>
+      `);
+    }
+
+    function saveEditGift(id) {
+      const g = db.gifts.find(item => item.id === id);
+      if (g) {
+        g.title = document.getElementById('egTitle').value;
+        g.recipient = document.getElementById('egRecipient').value;
+        g.amount = Number(document.getElementById('egAmount').value);
+        g.date = document.getElementById('egDate').value;
+        g.status = document.getElementById('egStatus').value;
+        g.note = document.getElementById('egNote').value;
+        renderGifts();
+        closeModal();
+      }
+    }
+
+    function deleteGift(id) {
+      if(confirm('確定要刪除這筆送禮紀錄嗎？')) {
+        db.gifts = db.gifts.filter(g => g.id !== id);
+        renderGifts();
+        closeModal();
+      }
     }
 
     // --- 記事本 ---
