@@ -229,7 +229,7 @@
         </div>
       </section>
 
-      <!-- TAB 2: 行事曆 Calendar (改成上下結構) -->
+      <!-- TAB 2: 行事曆 Calendar (上下結構) -->
       <section id="tab-calendar" class="hidden h-full flex flex-col space-y-4">
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-bold text-gray-800 flex items-center space-x-2">
@@ -279,7 +279,13 @@
 
       <!-- TAB 3: 簽核管理 Approval -->
       <section id="tab-approval" class="hidden space-y-4">
-        <h2 class="text-xl font-bold text-gray-800">簽核文件管理</h2>
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-bold text-gray-800">簽核文件管理</h2>
+          <button onclick="openNewApprovalModal()" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold shadow hover:bg-blue-700 transition flex items-center space-x-1">
+            <i data-lucide="file-plus" class="w-4 h-4"></i>
+            <span>+ 新增簽核文件</span>
+          </button>
+        </div>
         <div class="bg-white/75 backdrop-blur-md rounded-2xl shadow-sm border border-white overflow-hidden">
           <table class="w-full text-left text-sm">
             <thead class="bg-gray-50/80 text-gray-600 font-semibold border-b">
@@ -313,7 +319,7 @@
         </div>
       </section>
 
-      <!-- TAB 5: 名片資料庫 Contacts (加上次見面時間與認識地點) -->
+      <!-- TAB 5: 名片資料庫 Contacts (包含上次見面時間與認識地點) -->
       <section id="tab-contacts" class="hidden space-y-4">
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-bold text-gray-800">名片通訊錄</h2>
@@ -327,7 +333,7 @@
         </div>
       </section>
 
-      <!-- TAB 6: 送禮規劃 Gift Plan (加上金額) -->
+      <!-- TAB 6: 送禮規劃 Gift Plan (包含金額) -->
       <section id="tab-gifts" class="hidden space-y-4">
         <h2 class="text-xl font-bold text-gray-800">送禮與公關紀錄</h2>
         <div class="grid grid-cols-2 gap-6" id="giftGrid">
@@ -421,7 +427,6 @@
         { id: 1, title: "09/15 董事長指示事項", content: "1. 請安排下週二與營造團隊針對竹東進度進行特報。<br>2. 準備中秋致贈禮品名冊與預算審核。" },
         { id: 2, title: "09/10 開發部例會紀錄", content: "竹北案第三期建照核發預計於下個⽉底前完成，請與建管處保持聯繫。" }
       ],
-      // 週一至週五每天排滿 2-3 個行程 (9/14 - 9/18)
       schedules: {
         "2026-09-14": [
           { type: "會議", time: "09:00 - 10:30", title: "週一晨會與各部門進度對齊", loc: "A棟301", detail: "核對本週重點專案及重大排程" },
@@ -510,7 +515,7 @@
       `);
     }
 
-    // --- 行事曆 (上下版面) ---
+    // --- 行事曆 ---
     function renderCalendar() {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
@@ -605,7 +610,7 @@
       `);
     }
 
-    // --- 名片通訊錄 (包含上次見面時間與認識地點) ---
+    // --- 名片通訊錄 ---
     function renderContacts() {
       const grid = document.getElementById('contactGrid');
       grid.innerHTML = db.contacts.map(c => `
@@ -687,7 +692,7 @@
       }
     }
 
-    // --- 送禮規劃 (加上金額) ---
+    // --- 送禮規劃 ---
     function renderGifts() {
       const grid = document.getElementById('giftGrid');
       grid.innerHTML = db.gifts.map(g => `
@@ -726,7 +731,7 @@
       `);
     }
 
-    // --- 記事本 (歷史紀錄範本 可編輯/刪除) ---
+    // --- 記事本 ---
     function formatDoc(cmd, value = null) {
       document.execCommand(cmd, false, value);
     }
@@ -784,7 +789,7 @@
       }
     }
 
-    // --- 左下角個人名片與編輯 ---
+    // --- 個人名片 ---
     function handleUserAvatarUpload(e) {
       const file = e.target.files[0];
       if (file) {
@@ -844,7 +849,7 @@
       closeModal();
     }
 
-    // --- 簽核管理 (狀態已改為動態可選選單) ---
+    // --- 簽核管理 ---
     function renderApprovals() {
       const tbody = document.getElementById('approvalTableBody');
       tbody.innerHTML = db.approvals.map(a => `
@@ -884,6 +889,59 @@
         item.status = newStatus;
         renderApprovals();
       }
+    }
+
+    // 新增簽核文件功能
+    function openNewApprovalModal() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const autoCode = `AP-${new Date().getFullYear()}-${String(db.approvals.length + 1).padStart(3, '0')}`;
+      
+      showModal(`
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold text-gray-800">新增簽核文件</h3>
+          <div class="space-y-3 text-xs">
+            <div><label class="block mb-1 font-bold">公文編號</label><input type="text" id="newAppCode" value="${autoCode}" class="w-full p-2 border rounded-lg bg-gray-50"></div>
+            <div><label class="block mb-1 font-bold">簽核主旨</label><input type="text" id="newAppTitle" placeholder="例如：竹北建案廣告預算追加" class="w-full p-2 border rounded-lg"></div>
+            <div><label class="block mb-1 font-bold">申請人</label><input type="text" id="newAppApplicant" placeholder="例如：林專案經理" class="w-full p-2 border rounded-lg"></div>
+            <div><label class="block mb-1 font-bold">初始狀態</label>
+              <select id="newAppStatus" class="w-full p-2 border rounded-lg bg-white">
+                <option value="待審核">待審核</option>
+                <option value="審核中">審核中</option>
+                <option value="已完成">已完成</option>
+                <option value="已退回">已退回</option>
+              </select>
+            </div>
+            <div><label class="block mb-1 font-bold">簽核說明內容</label><textarea id="newAppContent" rows="4" placeholder="輸入詳細內容..." class="w-full p-2 border rounded-lg"></textarea></div>
+          </div>
+          <button onclick="saveNewApproval('${todayStr}')" class="w-full py-2 bg-blue-600 text-white font-bold rounded-xl text-xs shadow hover:bg-blue-700">建立公文</button>
+        </div>
+      `);
+    }
+
+    function saveNewApproval(todayStr) {
+      const code = document.getElementById('newAppCode').value;
+      const title = document.getElementById('newAppTitle').value;
+      const applicant = document.getElementById('newAppApplicant').value;
+      const status = document.getElementById('newAppStatus').value;
+      const content = document.getElementById('newAppContent').value;
+
+      if (!title || !applicant) {
+        alert('請填寫簽核主旨與申請人');
+        return;
+      }
+
+      db.approvals.unshift({
+        id: Date.now(),
+        code: code || `AP-${Date.now()}`,
+        title,
+        applicant,
+        date: todayStr,
+        status: status || "待審核",
+        content: content || "無詳細內容"
+      });
+
+      renderApprovals();
+      closeModal();
     }
 
     function editApproval(id) {
